@@ -13,8 +13,6 @@ staging:
     type: deploy
     stage: staging
     script:
-	# this configures Django application to use attached postgres database that is run on `postgres` host
-	- export DATABASE_URL=postgres://postgres:@postgres:5432/python-test-app
         - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
     only:
         - staging
