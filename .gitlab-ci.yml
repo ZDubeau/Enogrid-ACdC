@@ -2,7 +2,7 @@ image: python:3.8
 
 before_script:
     - apt-get update -qy
-    - pipenv install --dev --deploy
+    - apt-get install -y python-dev python-pip
     - pip install -r requirements.txt
 
 stages:
@@ -12,8 +12,9 @@ stages:
 staging:
     type: deploy
     stage: staging
-    image: ruby:latest
     script:
+	# this configures Django application to use attached postgres database that is run on `postgres` host
+	- export DATABASE_URL=postgres://postgres:@postgres:5432/python-test-app
         - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
     only:
         - staging
@@ -21,7 +22,6 @@ staging:
 production:
     type: deploy
     stage: production
-    image: ruby:latest
     script:
         - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
     only:
