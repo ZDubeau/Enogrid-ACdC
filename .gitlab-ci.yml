@@ -1,0 +1,28 @@
+image: python:3.8
+
+before_script:
+    - apt-get update -qy
+    - pipenv install --dev --deploy
+    - pip install -r requirements.txt
+
+stages:
+    - staging
+    - production
+
+staging:
+    type: deploy
+    stage: staging
+    image: ruby:latest
+    script:
+        - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
+    only:
+        - staging
+
+production:
+    type: deploy
+    stage: production
+    image: ruby:latest
+    script:
+        - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+    only:
+        - master
