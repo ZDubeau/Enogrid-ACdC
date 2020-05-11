@@ -1,10 +1,5 @@
 image: python:3.8
 
-before_script:
-    - apt-get update -qy
-    - apt-get install -y python-dev python-pip
-    - pip install -r requirements.txt
-
 stages:
     - staging
     - production
@@ -12,15 +7,23 @@ stages:
 staging:
     type: deploy
     stage: staging
+    variables:
+        HEROKU_APP: enogrid-staging
+        HEROKU_API_KEY: b064e520-936c-4c5b-88af-cfa53d64735a
     script:
-        - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
+        - git remote add heroku https://git.heroku.com/enogrid-staging.git
+        - git push heroku HEAD:refs/heads/staging
     only:
         - staging
 
 production:
     type: deploy
     stage: production
+    variables:
+        HEROKU_APP: enogrid
+        HEROKU_API_KEY: b064e520-936c-4c5b-88af-cfa53d64735a
     script:
-        - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+        - git remote add heroku https://git.heroku.com/enogrid.git
+        - git push heroku HEAD:refs/heads/master
     only:
         - master
