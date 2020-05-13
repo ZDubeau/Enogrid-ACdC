@@ -105,16 +105,13 @@ def Delete(cur, table, condition, MonTuple):
 
 
 def make_engine():
-    with open('info_connection.json') as json_file:
-        data = json.load(json_file)
-    environnement = os.getenv("FLASK_ENV")
     db_connect_url = sqla_url.URL(
         drivername='postgresql+psycopg2',
-        username=data[environnement]['user'],
-        password=data[environnement]['password'],
-        host=data[environnement]['host'],
-        port=data[environnement]['port'],
-        database=data[environnement]['dbname'])
+        username=os.getenv("USER"),
+        password=os.getenv("PASSWORD"),
+        host=os.getenv("HOST"),
+        port=os.getenv("PORT"),
+        database=os.getenv("DB_NAME"))
     try:
         # Create engine for postgreSQL
         engine = create_engine(db_connect_url, echo=False)

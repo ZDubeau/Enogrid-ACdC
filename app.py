@@ -83,6 +83,8 @@ def post_project_new():
     return redirect(url_for("get_projects_analyse", errorMessage="Nouveau projet créé !!"))
 
 
+#----------------------- Edit Project -------------------------#
+
 @app.route('/project_edit/<id>', methods=['GET'])
 def get_project_edit(id):
     if 'errorMessage' in request.args:
@@ -102,8 +104,8 @@ def get_project_edit(id):
         f"SELECT id_f as id_file, id_pa as id_projet,status, template, file_type as type, number_line as longueur, normalisation_duration as normalisation, standardisation_duration as standardisation,'' as télécharger, '' supprimer FROM files WHERE id_pa={id};", engine)
     return render_template('pages/project_edit.html', project_name=project_name, tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditFiles', index=False)], errorMessage=errorMessage, id_pa=id)
 
-#------------------------ Remove Project---------------------------#
 
+#------------------------ Remove Project---------------------------#
 
 @app.route('/project_delete/<id>', methods=['GET'])
 def get_project_delete(id):
@@ -111,12 +113,10 @@ def get_project_delete(id):
     Execute_SQL(cur, td.delete_project_analyse, {'id_pa': id})
     Commit(conn)
     DeconnexionDB(conn, cur)
-
     return redirect(url_for("get_projects_analyse", errorMessage="Le projet et tout les contenus ont bien été supprimé !"))
 
 
 #------------------------ Remove File---------------------------#
-
 
 @app.route('/delete_file/<id>', methods=['GET'])
 def get_delete_file(id):
@@ -149,6 +149,7 @@ def get_download_file(id):
 def get_files():
     return render_template('pages/files.html')
 
+#---------------------------------------------------------------#
 
 @app.route('/file_add', methods=['POST'])
 def get_file_add():
@@ -174,6 +175,14 @@ def get_file_add():
     else:
         errorMessage = "Fichier non valide"
     return redirect(url_for("get_project_edit", id=id_pa, errorMessage=errorMessage))
+
+
+#-------------------------- Graph ------------------------------#
+
+@app.route('/graph', methods=['GET', 'POST'])
+def get_graph():
+    return render_template('pages/graph.html')
+
 #---------------------- Documentation --------------------------#
 
 

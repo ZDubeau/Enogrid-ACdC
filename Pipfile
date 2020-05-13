@@ -24,6 +24,7 @@ billiard = "*"
 plotly = "*"
 dash = "*"
 gunicorn = "*"
+streamlit = "*"
 
 [requires]
 python_version = "3.8"
