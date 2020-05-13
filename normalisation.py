@@ -335,7 +335,7 @@ def template5(csv, origin="standalone"):
     df['date_time'] = df['date_time'].str.replace("T", " ", case=False)
     df['date_time'] = df['date_time'].str.replace(";", "", case=False)
     df['date_time'] = pd.to_datetime(
-        df['date_time'], format='%Y-%m-%d %H:%M:%S', errors='ignore')
+        df['date_time'], format='%Y-%m-%d %H:%M:%S', errors='ignore', utc=True)
     df['date_time'] = df['date_time'].dt.tz_localize(None)
     df['Watts'] = df['Watts'].astype(float)
     df['Watts'] = df['Watts'].fillna(0)
