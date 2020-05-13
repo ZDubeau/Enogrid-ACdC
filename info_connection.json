@@ -1,0 +1,23 @@
+{
+    "development": {
+        "dbname": "enogrid_acdc",
+        "user": "enogrid",
+        "password": "acdc",
+        "host": "localhost",
+        "port": 5432
+    },
+    "production": {
+        "dbname": "d77so0l8kc026d",
+        "user": "xvxtgrplpaaijr",
+        "password": "77c8e21ca7ec3ec0dc598452ee0809888cd96ad421101d4b0eef88f088d1052e",
+        "host": "ec2-46-137-156-205.eu-west-1.compute.amazonaws.com",
+        "port": 5432
+    },
+    "staging": {
+        "dbname": "df38bbul53ga8f",
+        "user": "nvhxkghrrxevlx",
+        "password": "ce6c5bc543fc447041e64e734ad987a0100887ef49023ee6ba7e544817633992",
+        "host": "ec2-79-125-26-232.eu-west-1.compute.amazonaws.com",
+        "port": 5432
+    }
+}
