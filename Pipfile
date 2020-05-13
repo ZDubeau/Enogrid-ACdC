@@ -23,6 +23,7 @@ redis = "*"
 billiard = "*"
 plotly = "*"
 dash = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
