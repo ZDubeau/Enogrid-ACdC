@@ -1,4 +1,6 @@
-image: python:3.8
+before_script:
+    - apt-get update -qy
+    - gem install dpl
 
 stages:
     - staging
@@ -7,23 +9,15 @@ stages:
 staging:
     type: deploy
     stage: staging
-    variables:
-        HEROKU_APP: enogrid-staging
-        HEROKU_API_KEY: b064e520-936c-4c5b-88af-cfa53d64735a
     script:
-        - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git
-        - git push heroku HEAD:refs/heads/staging
+        - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
     only:
         - staging
 
 production:
     type: deploy
     stage: production
-    variables:
-        HEROKU_APP: enogrid
-        HEROKU_API_KEY: b064e520-936c-4c5b-88af-cfa53d64735a
     script:
-        - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git
-        - git push heroku HEAD:refs/heads/master
+        - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
     only:
         - master
