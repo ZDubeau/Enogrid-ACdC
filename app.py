@@ -17,6 +17,7 @@ import definition_tables as td
 import identification
 from celery.signals import worker_process_init
 from multiprocessing import current_process
+from pathlib import Path
 
 
 @worker_process_init.connect
@@ -169,6 +170,8 @@ def get_file_add():
         id_f = cur.fetchone()[0]
         filename = os.path.join(
             os.getcwd(), app.config['UPLOAD_FOLDER'], str(id_f) + "." + file.filename.rsplit('.', 1)[1].lower())
+        Path(os.path.join(
+            os.getcwd(), app.config['UPLOAD_FOLDER'])).mkdir(parents=True, exist_ok=True)
         file.save(filename)
         file_treatment.apply_async(
             args=[id_f, filename], countdown=2)
