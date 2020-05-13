@@ -172,9 +172,12 @@ def get_file_add():
             os.getcwd(), app.config['UPLOAD_FOLDER'], str(id_f) + "." + file.filename.rsplit('.', 1)[1].lower())
         Path(os.path.join(
             os.getcwd(), app.config['UPLOAD_FOLDER'])).mkdir(parents=True, exist_ok=True)
+        print('path validé')
         file.save(filename)
+        print('fichier uploadé')
         file_treatment.apply_async(
             args=[id_f, filename], countdown=2)
+        print('traitement demandé')
         errorMessage = "Fichier ajouté au projet"
     else:
         errorMessage = "Fichier non valide"
