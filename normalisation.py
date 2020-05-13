@@ -377,6 +377,8 @@ def template6(xlsx, origin="standalone"):
 
 # --------------------------------------------------------------------------------------
 
+# nex comment
+
 
 def template7(xlsx, origin="standalone"):
     ''' The function that return Template_7 with good format (T7_xlsx_1h) '''
