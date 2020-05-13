@@ -68,9 +68,7 @@ def get_projects_analyse():
         errorMessage = request.args.get('errorMessage')
     else:
         errorMessage = ""
-    conn, cur = ConnexionDB()
     engine = make_engine()
-    print('toto')
     df = pd.read_sql(td.select_project_analyse_all, engine)
     return render_template('pages/projects_analyse.html', tables=[df.to_html(classes='table table-bordered', table_id='dataTableProject', index=False)], errorMessage=errorMessage,)
 
