@@ -20,7 +20,7 @@ def ConnexionDB():
     user = os.getenv("USER")
     password = os.getenv("PASSWORD")
     host = os.getenv("HOST")
-    port = os.getenv("PORT")
+    port = os.getenv("PORTE")
     try:
         conn = psycopg2.connect(dbname=dbname, user=user,
                                 password=password, host=host, port=port)
@@ -110,11 +110,11 @@ def make_engine():
         username=os.getenv("USER"),
         password=os.getenv("PASSWORD"),
         host=os.getenv("HOST"),
-        port=os.getenv("PORT"),
+        port=os.getenv("PORTE"),
         database=os.getenv("DB_NAME"))
     print(db_connect_url)
     print(os.getenv("USER"), os.getenv("PASSWORD"), os.getenv(
-        "HOST"), os.getenv("PORT"), os.getenv("DB_NAME"))
+        "HOST"), os.getenv("PORTE"), os.getenv("DB_NAME"))
     try:
         # Create engine for postgreSQL
         engine = create_engine(db_connect_url, echo=False)
