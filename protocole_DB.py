@@ -112,7 +112,6 @@ def make_engine():
         host=os.getenv("HOST"),
         port=os.getenv("PORTE"),
         database=os.getenv("DB_NAME"))
-    print(os.getenv("PORTE"), os.getenv("PORT"))
     try:
         # Create engine for postgreSQL
         engine = create_engine(db_connect_url, echo=False)
