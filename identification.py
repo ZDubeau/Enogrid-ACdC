@@ -19,7 +19,7 @@ def identification(file):
             file).columns.ravel().tolist())
         df = pd.read_excel(file)
     else:
-        dispatching_info = f"File extension {extension} unknown - treatment impossible"
+        dispatching_info = f'File extension {extension} unknown - treatment impossible'
         df = pd.DataFrame(columns=['Date_Time', 'kW'])
     return dispatching_info, df
 
