@@ -20,11 +20,7 @@ psycopg2-binary = "*"
 werkzeug = "*"
 celery = {extras = ["redis"],version = "*"}
 redis = "*"
-billiard = "*"
-plotly = "*"
-dash = "*"
 gunicorn = "*"
-streamlit = "*"
 
 [requires]
 python_version = "3.8"
