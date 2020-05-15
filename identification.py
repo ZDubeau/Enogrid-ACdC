@@ -38,7 +38,7 @@ def iden_norm_stand(file, origin='standalone'):
         print(error)
         end_identification_date = datetime.datetime.now()
         traitement = end_identification_date-start_date
-        return "Inconnu", traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+        return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
 
 
 def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_info, start_date, origin="standalone"):
@@ -68,10 +68,10 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
                 dataframe, df_result)
         end_standard_date = datetime.datetime.now()
         return file_type, end_identification_date-start_date, preparation, end_import_date-end_identification_date, end_standard_date - end_import_date, dataframe, df_result
-    except KeyError:
+    except Exception as error:
         end_identification_date = datetime.datetime.now()
         traitement = end_identification_date-start_date
-        return "Inconnu", traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+        return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
 
 
 if __name__ == "__main__":
