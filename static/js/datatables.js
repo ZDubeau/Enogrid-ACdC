@@ -26,7 +26,7 @@ $(document).ready(function () {
       $('td:eq(3)', nRow).html(view);
       $('td:eq(3)', nRow).click(function () {
         var id = aData[0];
-        window.location.href = '/project_view/' + id;
+        window.location.href = '/graph/' + id;
       });
       $('td:eq(4)', nRow).html(cancel);
       $('td:eq(4)', nRow).click(function () {
