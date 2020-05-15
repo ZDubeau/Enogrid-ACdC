@@ -18,17 +18,14 @@ import identification
 from celery.signals import worker_process_init
 from multiprocessing import current_process
 from pathlib import Path
+import urllib.parse
 
 
-@worker_process_init.connect
-def fix_multiprocessing(**kwargs):
-    try:
-        current_process()._config
-    except AttributeError:
-        current_process()._config = {'semprefix': '/mp'}
+url = urllib.parse.urlparse(os.environ.get('REDISCLOUD_URL'))
+r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
 
 
-UPLOAD_FOLDER = 'uploaded_files'
+UPLOAD_FOLDER = 'tmp'
 ALLOWED_EXTENSIONS = {'csv', 'xlsx'}
 
 app = Flask(__name__)
@@ -148,7 +145,16 @@ def get_download_file(id):
 
 @app.route('/files', methods=['GET'])
 def get_files():
-    return render_template('pages/files.html')
+    conn, cur = ConnexionDB()
+    Execute_SQL(cur, "SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'consommation' AND id_pa=1) GROUP BY month ORDER BY month;")
+    consommation_data = list()
+    for row in cur.fetchall():
+        consommation_data.append(row[1])
+    Execute_SQL(cur, "SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'production' AND id_pa=1) GROUP BY month ORDER BY month;")
+    production_data = list()
+    for row in cur.fetchall():
+        production_data.append(row[1])
+    return render_template('pages/files.html', consommation_data=consommation_data, production_data=production_data)
 
 #---------------------------------------------------------------#
 
@@ -172,23 +178,46 @@ def get_file_add():
             os.getcwd(), app.config['UPLOAD_FOLDER'], str(id_f) + "." + file.filename.rsplit('.', 1)[1].lower())
         Path(os.path.join(
             os.getcwd(), app.config['UPLOAD_FOLDER'])).mkdir(parents=True, exist_ok=True)
-        print('path validé')
         file.save(filename)
-        print('fichier uploadé')
-        file_treatment.apply_async(
-            args=[id_f, filename], countdown=2)
-        print('traitement demandé')
+        dispatching_info, df = identification.identification(filename)
+        if (not dispatching_info.find("File extension ")):
+            errorMessage = "Fichier non valide"
+        else:
+            file_treatment.apply_async(
+                args=[id_f, df.to_json(), dispatching_info], countdown=2)
+
         errorMessage = "Fichier ajouté au projet"
     else:
         errorMessage = "Fichier non valide"
+    os.remove(filename)
     return redirect(url_for("get_project_edit", id=id_pa, errorMessage=errorMessage))
 
 
 #-------------------------- Graph ------------------------------#
 
-@app.route('/graph', methods=['GET', 'POST'])
-def get_graph():
-    return render_template('pages/graph.html')
+@app.route('/graph/<id>', methods=['GET', 'POST'])
+def get_graph(id):
+    conn, cur = ConnexionDB()
+    Execute_SQL(
+        cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'consommation' AND id_pa={id}) GROUP BY month ORDER BY month;")
+    consommation_data = list()
+    for row in cur.fetchall():
+        consommation_data.append(row[1])
+    Execute_SQL(
+        cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'production' AND id_pa={id}) GROUP BY month ORDER BY month;")
+    production_data = list()
+    surplus_data = list()
+    i = 0
+    for row in cur.fetchall():
+        production_data.append(row[1])
+        if (consommation_data[i] > production_data[i]):
+            surplus_data.append(0)
+        else:
+            surplus_data.append(production_data[i]-consommation_data[i])
+        i += 1
+    Execute_SQL(cur, f"SELECT name_pa FROM project_analyse WHERE id_pa={id}")
+    name_pa = cur.fetchone()[0]
+    return render_template('pages/graph.html', projet=name_pa, consommation_data=consommation_data, production_data=production_data, surplus_data=surplus_data)
 
 #---------------------- Documentation --------------------------#
 
@@ -203,21 +232,22 @@ def get_documentation():
 
 
 @celery.task
-def file_treatment(id, filename):
+def file_treatment(id, dfjson, dispatching_info: str):
+    start_date = datetime.datetime.now()
     try:
         conn, cur = ConnexionDB()
         engine = make_engine()
         Execute_SQL(cur, td.update_files_in_progress, {'id_f': id})
+        df = pd.read_json(dfjson)
         Commit(conn)
         file_type, identification_duration, preparation_duration, normalisation_duration, standardisation_duration, dataframe, df_result = identification.identification_normalisation_standardisation(
-            filename, "web")
+            df, dispatching_info, start_date, "web")
         Execute_SQL(cur, td.update_files_done, {'id_f': id, "template": file_type, 'number_line': len(
             dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration})
         Commit(conn)
         df_result['id_f'] = id
         df_result.to_sql('result', con=engine, index=False, if_exists='append')
         DeconnexionDB(conn, cur)
-        os.remove(filename)
     except (KeyError, TypeError, NameError, AttributeError, ZeroDivisionError, IndentationError, IndexError, ValueError) as error:
         conn, cur = ConnexionDB()
         Execute_SQL(cur, td.update_files_error, {'id_f': id})
