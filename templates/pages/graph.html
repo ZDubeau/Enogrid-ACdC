@@ -1,0 +1,197 @@
+{% extends "layout.html" %}
+
+{% block page %}
+<style>
+    #myAreaChart {
+        height: 400px;
+    }
+
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 310px;
+        max-width: 800px;
+        margin: 1em auto;
+    }
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #EBEBEB;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+</style>
+<div class="container-fluid">
+    <div class="card mb-4">
+        <div class="card-header"
+            style="font-size: large;font-weight: bold;color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);border-color: rgb(167, 145, 189);">
+            <i class="fas fa-chart-area mr-1"></i>Graphe pour {{projet}}</div>
+        <h3 style="background-color: rgb(167, 145, 189); color: rgb(0, 0, 0);padding-bottom: 15px;padding-left: 20px;">
+            Production, consommation et
+            surplus</h3>
+        <div class="card-body">
+            <div id="myAreaChart" width="100%" height="30"></div>
+        </div>
+    </div>
+</div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+    var data_consommation = {{ consommation_data }};
+    var data_production = {{ production_data }};
+    var data_surplus = {{ surplus_data }};
+    Highcharts.chart('myAreaChart', {
+        chart: {
+            zoomType: 'xy',
+            backgroundColor: '#F0F8FF'
+        },
+        title: {
+            text: '                 ',
+            align: 'left'
+        },
+        xAxis: [{
+            categories: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+            crosshair: true
+        }],
+        yAxis: [{ // Primary yAxis
+            labels: {
+                format: '{value} kWh',
+                style: {
+                    color: '#488A62'
+                }
+            },
+            title: {
+                text: 'Production / Consommation',
+                style: {
+                    color: '#352D3D'
+                }
+            },
+            opposite: true
+
+        }, { // Secondary yAxis
+            gridLineWidth: 0,
+            title: {
+                text: 'Surplus',
+                style: {
+                    color: '#352D3D'
+                }
+            },
+            labels: {
+                format: '{value} kWh',
+                style: {
+                    color: '#5D518A'
+                }
+            }
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'left',
+            x: 80,
+            verticalAlign: 'top',
+            y: 55,
+            floating: true,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || // theme
+                'rgba(255,255,255,0.25)'
+        },
+        series: [{
+            name: 'Surplus',
+            type: 'column',
+            yAxis: 1,
+            data: data_surplus,
+            tooltip: {
+                valueSuffix: ' kWh'
+            }
+
+        }, {
+            name: 'Consommation',
+            type: 'spline',
+            color: '#E32636',
+            data: data_consommation,
+            tooltip: {
+                valueSuffix: ' kWh'
+            }
+
+        }, {
+            name: 'Production',
+            type: 'spline',
+            color: '#1DC285',
+            data: data_production,
+            tooltip: {
+                valueSuffix: ' kWh'
+            }
+        }],
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        floating: false,
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        x: 0,
+                        y: 0
+                    },
+                    yAxis: [{
+                        labels: {
+                            align: 'right',
+                            x: 0,
+                            y: -6
+                        },
+                        showLastLabel: false
+                    }, {
+                        labels: {
+                            align: 'left',
+                            x: 0,
+                            y: -6
+                        },
+                        showLastLabel: false
+                    }, {
+                        visible: false
+                    }]
+                }
+            }]
+        }
+    });
+
+
+</script>
+{% endblock page %}
