@@ -225,6 +225,7 @@ def template1(csv, origin="standalone"):
     df['Watts'] = df['Watts'].str.replace(',', '.').astype(float)
     get_kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = get_kW['Watts']  # rename col Watt to kW
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -249,6 +250,7 @@ def template1_pd(df: pd.DataFrame, origin="standalone"):
     df['Watts'] = df['Watts'].str.replace(',', '.').astype(float)
     get_kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = get_kW['Watts']  # rename col Watt to kW
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -279,6 +281,9 @@ def template2(csv, origin="standalone"):
     df['Watts'] = df['Watts'].fillna(0)
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    # print(df.duplicated('Date_Time'))
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
+    # print(df['Date_Time'].value_counts())
 
     end_prep_date = datetime.datetime.now()
 
@@ -304,6 +309,9 @@ def template2_pd(df: pd.DataFrame, origin="standalone"):
     df['Watts'] = df['Watts'].fillna(0)
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    # print(df.duplicated('Date_Time'))
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
+    # print(df['Date_Time'].value_counts())
 
     end_prep_date = datetime.datetime.now()
 
@@ -332,6 +340,7 @@ def template3(csv, origin="standalone"):
     df['Watts'] = pd.to_numeric(df['Watts'], errors='coerce')
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -356,6 +365,7 @@ def template3_pd(df: pd.DataFrame, origin="standalone"):
     df['Watts'] = pd.to_numeric(df['Watts'], errors='coerce')
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -382,6 +392,7 @@ def template4(xlsx, origin="standalone"):
         df["date_time"], format='%d/%m/%Y %H:%M:%S', errors='ignore')
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -404,6 +415,7 @@ def template4_pd(df: pd.DataFrame, origin="standalone"):
         df["date_time"], format='%d/%m/%Y %H:%M:%S', errors='ignore')
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -436,6 +448,7 @@ def template5(csv, origin="standalone"):
     df['Watts'] = df['Watts'].fillna(0)
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -464,6 +477,7 @@ def template5_pd(df: pd.DataFrame, origin="standalone"):
     df['Watts'] = df['Watts'].fillna(0)
     kW = df.select_dtypes(exclude=['object', 'datetime']) * 0.001
     df['kW'] = kW['Watts']
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -488,6 +502,8 @@ def template6(xlsx, origin="standalone"):
     df['date_time'] = df['date_time'].apply(lambda x: x.replace(microsecond=0))
     df['date_time'] = pd.to_datetime(df['date_time'], errors='ignore')
     df = df[['date_time', 'kW']]
+    df = df.copy()
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -508,6 +524,8 @@ def template6_pd(df: pd.DataFrame, origin="standalone"):
     df['date_time'] = df['date_time'].apply(lambda x: x.replace(microsecond=0))
     df['date_time'] = pd.to_datetime(df['date_time'], errors='ignore')
     df = df[['date_time', 'kW']]
+    df = df.copy()
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -533,6 +551,8 @@ def template7(xlsx, origin="standalone"):
     df['date_time'] = pd.to_datetime(df['date_time'], errors='ignore')
     df['kwh'] = df['kWh']
     df = df[['date_time', 'kwh']]
+    df = df.copy()
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
@@ -549,10 +569,12 @@ def template7_pd(df: pd.DataFrame, origin="standalone"):
     df['date_time'] = pd.to_datetime(df['date_time'], errors='ignore')
     df['kwh'] = df['kWh']
     df = df[['date_time', 'kwh']]
+    df_result = df.copy()
+    df_result.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
-    return "Template 7", end_prep_date-start_date, df
+    return "Template 7", end_prep_date-start_date, df_result
 
 # ----------------------------------------------------------------------------------------
 # first function for get col date-time and col w in datetime and kW(float)
@@ -575,6 +597,7 @@ def template8(csv, origin="standalone"):
     df[['kW1', 'kW2']] = get_kW[['Watts1', 'Watts2']]  # rename col Watt to kW
     df.sort_values(by=['date_time'], inplace=True)
     df.reset_index(inplace=True, drop=True)
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     # df.to_csv("result_intermediaire_"+csv)
     df_result = pd.DataFrame(columns=['date_time', 'kW'])
@@ -619,6 +642,7 @@ def template8_pd(df: pd.DataFrame, origin="standalone"):
     df[['kW1', 'kW2']] = get_kW[['Watts1', 'Watts2']]  # rename col Watt to kW
     df.sort_values(by=['date_time'], inplace=True)
     df.reset_index(inplace=True, drop=True)
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     # df.to_csv("result_intermediaire_"+csv)
     df_result = pd.DataFrame(columns=['date_time', 'kW'])
@@ -692,6 +716,9 @@ def template9(csv, origin="standalone"):
     # replace and remove old index
     df.reset_index(inplace=True, drop=True)
 
+    # Drop duplicate of time changment
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
+
     end_prep_date = datetime.datetime.now()
 
     return "Template 9", end_prep_date-start_date, df
@@ -701,9 +728,6 @@ def template9_pd(df: pd.DataFrame, origin="standalone"):
     ''' The function that return Template_9 with good format (T9_csv_30min) '''
 
     start_date = datetime.datetime.now()
-
-    # convert csv to Dataframe
-    df = pd.read_csv(csv, sep='delimiter', engine='python')
 
     # split to 2 columns
     df['Horodate;Wh'] = df['Horodate;Wh'].str.split(';')
@@ -738,6 +762,9 @@ def template9_pd(df: pd.DataFrame, origin="standalone"):
 
     # replace and remove old index
     df.reset_index(inplace=True, drop=True)
+
+    # Drop duplicate of time changment
+    df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
     end_prep_date = datetime.datetime.now()
 
