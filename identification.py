@@ -8,29 +8,54 @@ import normalisation as nm
 import standardisation as sd
 
 
-def identification_normalisation_standardisation(file,  origin="standalone"):
+def identification(file):
+    extension = str.split(file, '.')[1]
+    if extension == 'csv':
+        with io.open(file, 'r', encoding='utf-8') as f:
+            dispatching_info = str(next(csv.reader(f)))
+        df = pd.read_csv(file, sep='delimiter', engine='python')
+    elif extension == 'xlsx':
+        dispatching_info = str(pd.read_excel(
+            file).columns.ravel().tolist())
+        df = pd.read_excel(file)
+    else:
+        dispatching_info = f"File extension {extension} unknown - treatment impossible"
+        df = pd.DataFrame(columns=['Date_Time', 'kW'])
+    return dispatching_info, df
+
+
+def iden_norm_stand(file, origin='standalone'):
     start_date = datetime.datetime.now()
-    dispatch = {
-        "['\\ufeffdatetime;W']": nm.template1,
-        "['Date;Time;W']": nm.template2,
-        "['Datetime;W']": nm.template3,
-        "['Datetime', 'W']": nm.template4,
-        "['\\ufeffHorodate;W']": nm.template5,
-        "['Datetime', 'kW']": nm.template6,
-        "['Date', 'Time', 'kWh']": nm.template7,
-        "['Datetime;W;W']": nm.template8,
-        "['Horodate;Wh']": nm.template9}
     try:
-        if str.split(file, '.')[1] == 'csv':
-            with io.open(file, 'r', encoding='utf-8') as f:
-                function = dispatch[str(next(csv.reader(f)))]
-        elif str.split(file, '.')[1] == 'xlsx':
-            function = dispatch[str(pd.read_excel(
-                file).columns.ravel().tolist())]
+        dispatching_info, df = identification(file)
+        if (not dispatching_info.find("File extension ")):
+            end_identification_date = datetime.datetime.now()
+            traitement = end_identification_date-start_date
+            return dispatching_info, traitement, traitement, traitement, traitement, df, pd.DataFrame(columns=['date_time', 'kwh'])
         else:
-            quit()
+            return identification_normalisation_standardisation(df, dispatching_info, start_date, origin)
+    except Exception as error:
+        print(error)
         end_identification_date = datetime.datetime.now()
-        file_type, preparation, dataframe = function(file, origin)
+        traitement = end_identification_date-start_date
+        return "Inconnu", traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+
+
+def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_info, start_date, origin="standalone"):
+    dispatch = {
+        "['\\ufeffdatetime;W']": nm.template1_pd,
+        "['Date;Time;W']": nm.template2_pd,
+        "['Datetime;W']": nm.template3_pd,
+        "['Datetime', 'W']": nm.template4_pd,
+        "['\\ufeffHorodate;W']": nm.template5_pd,
+        "['Datetime', 'kW']": nm.template6_pd,
+        "['Date', 'Time', 'kWh']": nm.template7_pd,
+        "['Datetime;W;W']": nm.template8_pd,
+        "['Horodate;Wh']": nm.template9_pd}
+    try:
+        function = dispatch[dispatching_info]
+        end_identification_date = datetime.datetime.now()
+        file_type, preparation, dataframe = function(df, origin)
         end_import_date = datetime.datetime.now()
         df_result = pd.DataFrame(columns=['date_time', 'kwh'])
         df_result['date_time'] = pd.date_range(
@@ -50,7 +75,7 @@ def identification_normalisation_standardisation(file,  origin="standalone"):
 
 
 if __name__ == "__main__":
-    file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = identification_normalisation_standardisation(
+    file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
         sys.argv[1], "standalone")
     dataframe.to_csv('result_normalisation_'+sys.argv[1])
     df_result.to_csv('result_'+sys.argv[1])
