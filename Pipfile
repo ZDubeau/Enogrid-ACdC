@@ -21,6 +21,7 @@ werkzeug = "*"
 celery = {extras = ["redis"],version = "*"}
 redis = "*"
 gunicorn = "*"
+billiard = "*"
 
 [requires]
 python_version = "3.8"
