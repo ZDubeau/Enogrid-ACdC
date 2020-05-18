@@ -55,6 +55,8 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
     try:
         function = dispatch[dispatching_info]
         end_identification_date = datetime.datetime.now()
+        dfjson = df.to_json(orient='table')
+        df = pd.read_json(dfjson, typ='frame', orient='table')
         file_type, preparation, dataframe = function(df, origin)
         end_import_date = datetime.datetime.now()
         df_result = pd.DataFrame(columns=['date_time', 'kwh'])
@@ -76,9 +78,10 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
 
 if __name__ == "__main__":
     file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
-        sys.argv[1], "standalone")
-    dataframe.to_csv('result_normalisation_'+sys.argv[1])
-    df_result.to_csv('result_'+sys.argv[1])
+        sys.argv[1], "web")
+    dataframe.to_csv('result_normalisation_' +
+                     str.split(sys.argv[1], '.')[1]+".csv")
+    df_result.to_csv('result_'+str.split(sys.argv[1], '.')[1]+".csv")
     print("Fichier : ", sys.argv[1])
     print("Template : ", file_type)
     print("Identification :", identification)

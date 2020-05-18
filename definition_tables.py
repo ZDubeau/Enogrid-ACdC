@@ -19,7 +19,12 @@ insert_project_analyse = """
   VALUES (%(name_pa)s) returning id_pa;"""
 
 select_project_analyse_all = """
-  SELECT id_pa, name_pa as Nom,'' as Statut, '' as Editer, '' as Voir, '' as Supprimer FROM project_analyse; """
+  SELECT pa.id_pa, name_pa as Nom,'' as Statut,prod.nb_prod as Nb_production,conso.nb_conso as Nb_consommation, '' as Editer, '' as Voir,'' as Télécharger, '' as Supprimer
+  FROM project_analyse AS pa 
+    LEFT JOIN (select id_pa,count(file_type) as nb_conso From files WHERE file_type='consommation' GROUP BY id_pa) AS conso 
+      ON pa.id_pa=conso.id_pa 
+    LEFT JOIN (select id_pa,count(file_type) as nb_prod From files WHERE file_type='production' GROUP BY id_pa) AS prod
+      ON pa.id_pa=prod.id_pa; """
 
 select_project_analyse = """
   SELECT * FROM project_analyse WHERE id_pa=%s; """
@@ -54,6 +59,9 @@ select_files = """
 
 select_files_id_pa = """
   SELECT id_pa FROM files WHERE id_f=%(id_f)s ; """
+
+select_files_id_with_id_pa = """
+  SELECT id_f FROM files WHERE id_pa=%(id_pa)s ; """
 
 update_files_in_progress = """
   UPDATE files SET status='En cours' WHERE id_f=%(id_f)s ; """

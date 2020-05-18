@@ -12,7 +12,7 @@
         {% endfor %}
     </div>
 </div>
-<p class="title" style="color: #DEBDFF;padding-bottom: 10px; padding-top: 25px;font-size:larger;">Ajouter un
+<p class="title" style="color: #DEBDFF;padding-top: 40px;font-size:larger;">Ajouter un
     fichier au projet
 </p>
 <form action="/file_add" method="post" enctype=multipart/form-data>
@@ -30,73 +30,12 @@
                 <option value="production">Production</option>
             </select>
         </div>
-        <div class="col-auto">
-            <div class="form-group form-check">
-                <label class="label" style="color: #DEBDFF;padding-top: 25px;transform: translate(-110px, 0px);">
-                    <input name="supprimer_zero" type="checkbox">
-                    &nbsp;&nbsp;Supprimer valeurs nulles initiales et finales
-                </label>
-            </div>
-        </div>
-        <div class="control" style="padding-top: 35px;">
+        <div class="control">
             <input name="id_pa" value="{{id_pa}}" type="hidden">
             <button type="submit" class="button is-link">Envoyer</button>
         </div>
     </div>
 </form>
-<!-- 
-<section id="app" class="hero is-fullheight">
-    <div class="hero-body" style="color: #DEBDFF;transform: translate(-265px, 0px);">
-        <div class="container">
-            <div class="columns">
-                <div class="column is-half is-offset-one-quarter" style="width: 55%;">
-                    <p class="title" style="color: #DEBDFF;padding-bottom: 25px;font-size:larger;">Ajouter un
-                        fichier au projet
-                    </p>
-                    <div>
-                        <form action="/file_add" method="post" enctype=multipart/form-data>
-                            <div class="custom-file">
-                                <input type="file" name="file" class="custom-file-input" id="validatedCustomFile"
-                                    style="color: mediumvioletred;" required>
-                                <label class="custom-file-label" for="validatedCustomFile">Choississez votre
-                                    fichier</label>
-                                <div class="invalid-feedback">Fichier au format csv ou xlsx</div>
-                            </div>
-                           
-                            <div class="form-group" style="color: #DEBDFF;">
-                                <label class="label" style="color: #DEBDFF;padding-top: 32px;">Type de
-                                    fichier</label>
-                                <select class="custom-select" style="width: 60%;" name="file_type" required>
-                                    <option value=""></option>
-                                    <option value="consommation">Consommation</option>
-                                    <option value="production">Production</option>
-                                </select>
-
-                            </div>
-                            
-                            <div class="field">
-                                <label class="label" style="color: #DEBDFF;padding-top: 25px;">Valeurs nulles
-                                    initiales
-                                    et finales</label>
-                                <label>
-                                    <input name="supprimer_zero" type="checkbox">
-                                    &nbsp;&nbsp;Supprimer
-                                </label>
-
-                            </div>
-                            <div class="field is-grouped is-grouped-left">
-                                <div class="control" style="padding-top: 35px;">
-                                    <input name="id_pa" value="{{id_pa}}" type="hidden">
-                                    <button class="button is-link" style="padding: 5px 25px;">Envoyer</button>
-                                </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
--->
 <h2 style="color: khaki;padding-top: 25px;">{{errorMessage}}</h2>
 
 {% endblock page %}

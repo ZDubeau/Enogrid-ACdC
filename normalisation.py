@@ -564,14 +564,14 @@ def template7_pd(df: pd.DataFrame, origin="standalone"):
 
     start_date = datetime.datetime.now()
 
-    df['date_time'] = df['Date'].str.cat(df['Time'], sep='')
+    df['date_time'] = df['Date'].apply(
+        lambda x: x.strftime("%Y-%m-%d")).str.cat(df['Time'], sep=' ')
     df.drop(columns=['Date', 'Time'], inplace=True)
     df['date_time'] = pd.to_datetime(df['date_time'], errors='ignore')
     df['kwh'] = df['kWh']
     df = df[['date_time', 'kwh']]
     df_result = df.copy()
     df_result.drop_duplicates(subset='date_time', keep='first', inplace=True)
-
     end_prep_date = datetime.datetime.now()
 
     return "Template 7", end_prep_date-start_date, df_result

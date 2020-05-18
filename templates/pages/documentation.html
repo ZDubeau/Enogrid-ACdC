@@ -2,50 +2,64 @@
 
 {% block page %}
 <div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
-    <div class="card-header" style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);">info_1</div>
-    <div class="card-body">
-        <h5 class="card-title">Info card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
+    <div class="card-header"
+        style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);font-weight: 700;font-size: large;">
+        Documentation
+    </div>
+
+    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+        <ul class="list-group">
+            <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
+                L’analyse d’un fichier se fait en trois étapes :
+                <ul class="list-group" style="padding-top: 20px;">
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - identification
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - normalisation
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - standardisation
+                    </li>
+                </ul>
+            </li>
+            <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
+                <strong>L’identification</strong> a pour but de trouver quel est le modèle du fichier soumis.
+                L’identification se base sur l’extension du fichier et l’entête des données. Si il n’y a pas de
+                correspondance le système indique que le fichier est de type inconnu.
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;">
+                <strong>La normalisation</strong> a pour but de traiter un fichier reconnu. 9 modèles ont été analysés
+                et sur la base de leur caractéristiques des fonctions de normalisations différentes ont été développées.
+                A la fin de la normalisation un jeu de donnée constitué d’entrées de type date avec heure et de
+                consommation en kWh sont disponibles. Le passage de W en kW se fait par une division par 1000, de Wh en
+                kWh également. Pour le passage de kW en kWh:</li>
+            <img src="{{ url_for('static', filename='/image/kWh.jpg') }}" class="mx-auto d-block"
+                alt="Responsive image">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;padding-top: 30px;">
+                Afin
+                d’optimiser les performances, un calcul matriciel est utilisé et un découpage du fichier avec du
+                recouvrement est fait pour permettre des traitements en parallèle (multithreading ou multiprocessing
+                suivant les cas)
+            </li>
+            <img src="{{ url_for('static', filename='/image/matrice.JPG') }}" class="mx-auto d-block"
+                alt="Responsive image">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;;padding-top: 30px;">
+                <strong>La standardisation</strong> consiste à faire un fichier avec une entrée toutes les 30 minutes
+                pendant 1 an soit 17520 entrées.
+                Dans le cas où un fichier normalisé est sur moins de 365 jours la somme des kWh en entrée de
+                standardisation doit être égal à la somme des kWh du fichier en sortie de la standardisation. Pour un
+                fichier de plus de 365 jours, la somme de la moyenne des kWh par jour du fichier d’entrée (en excluant
+                le 29 février) doit être égale à la somme des kWh du fichier de sortie.
+            </li>
+        </ul>
     </div>
 </div>
 
-<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
-    <div class="card-header" style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);">info_2</div>
-    <div class="card-body">
-        <h5 class="card-title">Dark card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
-    </div>
-</div>
-
-<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
-    <div class="card-header" style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);">info_3</div>
-    <div class="card-body">
-        <h5 class="card-title">Danger card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
-    </div>
-</div>
 {% endblock page %}

@@ -6,6 +6,10 @@
         height: 400px;
     }
 
+    .very-big {
+        font-size: 90px;
+    }
+
     .highcharts-figure,
     .highcharts-data-table table {
         min-width: 310px;
@@ -54,137 +58,76 @@
         <div class="row justify-content-center">
             <div class="col-xs-6 col-sm-4">
                 <div class="card-body" style="background-color: #DEBCF0;border-radius: 4px;color: rgb(0, 0, 0);">
-                    Normalisation<br>00:00:25
+                    <p class="very-big">{{nb_projects}}</p><br>Projets d'analyse
                 </div>
             </div>
             <div class="col-xs-6 col-sm-4">
                 <div class="card-body" style="background-color: #DEBCF0;border-radius: 4px;color: rgb(0, 0, 0);">
-                    Standardisation<br>00:03:02
+                    <p class="very-big">{{avg_files}}</p><br> Fichiers par projets (moyenne)
                 </div>
             </div>
-            <!-- <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4">
-                <div class="card-body">Success Card</div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="small text-white stretched-link" href="#">View Details</a>
-                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            <div class="col-xs-6 col-sm-4">
+                <div class="card-body" style="background-color: #DEBCF0;border-radius: 4px;color: rgb(0, 0, 0);">
+                    <p class="very-big">{{avg_time_10000}}</p><br> secondes pour 10000 lignes (moyenne)
                 </div>
             </div>
-        </div> -->
         </div>
 
         <div class="row" style="padding-top: 50px;">
             <div class="col-xl-12">
                 <div class="card mb-4">
-                    <div class="card-header"><i class="fas fa-chart-area mr-1"></i>Area Chart Example</div>
-                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+                    <div class="card-header"
+                        style="background-color: rgb(167, 145, 189); color: black; border-radius: 4px 4px 0px 0px; font-size: large; font-weight: bold;">
+                        <i class="fas fa-clock mr-1"></i>Temps de traitement par modèle de fichier
+                    </div>
+                    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+                        <div id="myAreaChart" width="100%" height="40"></div>
+                    </div>
                 </div>
             </div>
         </div>
 </center>
-<!-- <div class="container-fluid">
-    <div class="row">
-        <div class="col-xl-4 col-lg-12">
-            <div class="card card-chart">
-                <div class="card-header card-header-success">
-                    <div class="ct-chart" id="dailySalesChart"></div>
-                </div>
-                <div class="card-body">
-                    <h4 class="card-title">Daily Sales</h4>
-                    <p class="card-category">
-                        <span class="text-success"><i class="fa fa-long-arrow-up"></i> 55% </span> increase in today
-                        sales.
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <div class="stats">
-                        <i class="material-icons">access_time</i> updated 4 minutes ago
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-lg-12">
-            <div class="card card-chart">
-                <div class="card-header card-header-warning">
-                    <div class="ct-chart" id="websiteViewsChart"></div>
-                </div>
-                <div class="card-body">
-                    <h4 class="card-title">Email Subscriptions</h4>
-                    <p class="card-category">Last Campaign Performance</p>
-                </div>
-                <div class="card-footer">
-                    <div class="stats">
-                        <i class="material-icons">access_time</i> campaign sent 2 days ago
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4 col-lg-12">
-            <div class="card card-chart">
-                <div class="card-header card-header-danger">
-                    <div class="ct-chart" id="completedTasksChart"></div>
-                </div>
-                <div class="card-body">
-                    <h4 class="card-title">Completed Tasks</h4>
-                    <p class="card-category">Last Campaign Performance</p>
-                </div>
-                <div class="card-footer">
-                    <div class="stats">
-                        <i class="material-icons">access_time</i> campaign sent 2 days ago
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="card mb-4">
-            <div class="card-header"><i class="fas fa-chart-area mr-1"></i>Area Chart Example</div>
-            <div class="card-body">
-                <div id="myAreaChart" width="100%" height="30"></div>
-            </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
-        </div>
-    </div>
-</div> -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <script>
-    Highcharts.chart('container', {
+    var categories = {{ categories| safe }};
+    var data_norm = {{ data_norm }};
+    var data_stand = {{ data_stand }};
+    Highcharts.chart('myAreaChart', {
         chart: {
-            type: 'column'
+            type: 'bar',
+            backgroundColor: '#F0F8FF'
         },
         title: {
-            text: 'Stacked column chart'
+            text: 'Durée de traitement pour 10000 lignes'
         },
         xAxis: {
-            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+            categories: categories
         },
         yAxis: {
             min: 0,
             title: {
-                text: 'Total fruit consumption'
+                text: 'Durée de traitement'
             }
         },
-        tooltip: {
-            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
-            shared: true
+        legend: {
+            reversed: true
         },
         plotOptions: {
-            column: {
-                stacking: 'percent'
+            series: {
+                stacking: 'normal'
             }
         },
         series: [{
-            name: 'John',
-            data: [5, 3, 4, 7, 2]
+            name: 'Durée de standardisation',
+            data: data_stand,
+            color: '#006666'
         }, {
-            name: 'Jane',
-            data: [2, 2, 3, 2, 1]
-        }, {
-            name: 'Joe',
-            data: [3, 4, 4, 2, 5]
+            name: 'Durée de normalisation',
+            data: data_norm,
+            color: '#00E699'
         }]
     });
 </script>
