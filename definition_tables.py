@@ -19,12 +19,14 @@ insert_project_analyse = """
   VALUES (%(name_pa)s) returning id_pa;"""
 
 select_project_analyse_all = """
-  SELECT pa.id_pa, name_pa as Nom,'' as Statut,prod.nb_prod as Nb_production,conso.nb_conso as Nb_consommation, '' as Editer, '' as Voir,'' as Télécharger, '' as Supprimer
+  SELECT pa.id_pa, name_pa as Nom, prod.nb_prod as Nb_production, conso.nb_conso as Nb_consommation, '' as Editer, MIN(info_status.status) as Statut, '' as Voir, '' as Télécharger, '' as Supprimer
   FROM project_analyse AS pa 
     LEFT JOIN (select id_pa,count(file_type) as nb_conso From files WHERE file_type='consommation' GROUP BY id_pa) AS conso 
       ON pa.id_pa=conso.id_pa 
     LEFT JOIN (select id_pa,count(file_type) as nb_prod From files WHERE file_type='production' GROUP BY id_pa) AS prod
-      ON pa.id_pa=prod.id_pa; """
+      ON pa.id_pa=prod.id_pa
+    LEFT JOIN (select id_pa,(CASE WHEN status='Analysé' Then 100 WHEN status='En cours' THEN 80 WHEN status='Non analysé' THEN 50 ELSE 0 END) AS status From files GROUP BY id_pa,status) AS info_status
+      ON pa.id_pa=info_status.id_pa GROUP BY pa.id_pa,Nb_production,Nb_consommation ; """
 
 select_project_analyse = """
   SELECT * FROM project_analyse WHERE id_pa=%s; """
@@ -97,3 +99,25 @@ select_result_for_file = """
 
 delete_result_for_file = """ 
   DELETE FROM result WHERE id_f=%(id_f)s;"""
+
+#################### Table normalisation ######################
+
+drop_result = """DROP TABLE IF EXISTS normalisation;"""
+
+# CASCADE means that the updated values of the referenced column(s) should be copied into the referencing row(s)
+normalisation = """
+  CREATE TABLE IF NOT EXISTS normalisation (
+        id_n SERIAL PRIMARY KEY,
+        date_time TIMESTAMP,
+        kwh FLOAT
+    )"""
+
+insert_normalisation = """
+  INSERT INTO result (id_n, date_time, kwh)
+  VALUES (%(id_n)s,%(date_time)s,%(kwh)s) returning id;"""
+
+select_normalisation = """ 
+  SELECT * FROM normalisation WHERE id_f=%(id_n)s;"""
+
+delete_normalisation = """ 
+  DELETE FROM normalisation WHERE id_f=%(id_n)s;"""
