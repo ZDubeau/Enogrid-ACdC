@@ -157,7 +157,7 @@ $(document).ready(function () {
       { title: "Type" },
       { title: "kWh_normalisé" },
       { title: "kWh_standardisé" },
-      { title: "Delta (ppm)" },
+      { title: "Delta (ppb)" },
       { title: "Télécharger (nm)" },
       { title: "Télécharger (sd)" }
     ],
@@ -169,7 +169,7 @@ $(document).ready(function () {
           $('td:eq(4)', nRow).html("");
           break;
         default:
-          ppm = Math.round(ppm, 0);
+          ppm = Math.abs(Math.round(ppm));
           $('td:eq(4)', nRow).html(ppm);
       }
       var id = aData[0];

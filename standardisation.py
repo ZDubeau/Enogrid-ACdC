@@ -68,16 +68,16 @@ def calcul_period_consumption(start_year, end_year, day, month, hour, minutes, d
                     (values['date_time']-entry_date).total_seconds()/60)*30.0
             previous_empty_periods_comsumption += consumption / \
                 len(just_after_period_entry)
-            period_consumption = round(abs(consumption /
-                                           len(just_after_period_entry)), 5)
+            period_consumption = abs(consumption /
+                                     len(just_after_period_entry))
         else:
             period_consumption = 0
     else:
         consumption = -previous_empty_periods_comsumption
         for values in in_period_entry:
             consumption += values['kwh']
-        period_consumption = round(abs(consumption /
-                                       (len(max_index_found))), 5)
+        period_consumption = abs(consumption /
+                                 (len(max_index_found)))
         previous_empty_periods_comsumption = 0.0
     return period_consumption, previous_empty_periods_comsumption
 

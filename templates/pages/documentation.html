@@ -27,13 +27,13 @@
                 </ul>
             </li>
             <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
-                <strong>L’identification</strong> a pour but de trouver quel est le modèle du fichier soumis.
+                L’<strong>identification</strong> a pour but de trouver quel est le modèle du fichier soumis.
                 L’identification se base sur l’extension du fichier et l’entête des données. Si il n’y a pas de
                 correspondance le système indique que le fichier est de type inconnu.
             </li>
             <li class="list-group-item"
                 style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;">
-                <strong>La normalisation</strong> a pour but de traiter un fichier reconnu. 9 modèles ont été analysés
+                La <strong>normalisation</strong> a pour but de traiter un fichier reconnu. 9 modèles ont été analysés
                 et sur la base de leur caractéristiques des fonctions de normalisations différentes ont été développées.
                 A la fin de la normalisation un jeu de donnée constitué d’entrées de type date avec heure et de
                 consommation en kWh sont disponibles. Le passage de W en kW se fait par une division par 1000, de Wh en
@@ -51,7 +51,7 @@
                 alt="Responsive image">
             <li class="list-group-item"
                 style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;;padding-top: 30px;">
-                <strong>La standardisation</strong> consiste à faire un fichier avec une entrée toutes les 30 minutes
+                La <strong>standardisation</strong> consiste à faire un fichier avec une entrée toutes les 30 minutes
                 pendant 1 an soit 17520 entrées.
                 Dans le cas ou un fichier normalisé est sur moins de 365 jours la somme des kWh en entrée de
                 standardisation doit être égal à la somme des kWh du fichier en sortie de la standardisation. Pour un
@@ -67,6 +67,16 @@
                 consommation sur la période de temps choisie (ici le mois). Afin de pouvoir différencier les graphes
                 représentant cette conommation, production et surplus par utilisateur, un nom devra être associé à
                 chaque fichier ajouté à un projet.
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;;padding-top: 30px;">
+                La <strong>validation</strong> des données consiste à comparer la moyenne de la somme des kWh sur un an
+                (en excluant les données du 29 Février) en fin de normalisation avec la somme des kWh en fin de
+                standardisation.<br>
+                L'écart entre les deux sommes sera exprimé en PPB (part par milliard) afin de mieux visualiser l'écart
+                entre les données normalisés et standardisés.<br>
+
+
             </li>
         </ul>
     </div>

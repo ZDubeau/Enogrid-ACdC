@@ -85,8 +85,8 @@ def get_homepage():
             for row in cur.fetchall():
                 categories.append(row[0])
                 lines = float(row[1])
-                data_norm.append(10000*row[2].total_seconds()/lines)
-                data_stand.append(10000*row[3].total_seconds()/lines)
+                data_norm.append(round(10000*row[2].total_seconds()/lines, 1))
+                data_stand.append(round(10000*row[3].total_seconds()/lines, 1))
     DeconnexionDB(conn, cur)
     return render_template('homepage.html', nb_projects=nb_projects, avg_files=avg_files, avg_time_10000=avg_time_10000, categories=categories, data_norm=data_norm, data_stand=data_stand)
 
@@ -225,7 +225,7 @@ def get_download_file_normalise(id):
 def get_files():
     engine = make_engine()
     df_files = pd.read_sql(
-        "SELECT id_f as id_file, id_pa as id_projet, file_name as name, template, kwh_one_year_normal as kwh_normalisé, kwh_one_year_standard as kwh_standardisé,(CASE WHEN kwh_one_year_normal=0 THEN NULL WHEN kwh_one_year_normal IS NULL THEN NULL ELSE round(1000000*(1-kwh_one_year_standard/kwh_one_year_normal)) END ) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files;", engine)
+        "SELECT id_f as id_file, id_pa as id_projet, file_name as name, template, kwh_one_year_normal as kwh_normalisé, kwh_one_year_standard as kwh_standardisé,(CASE WHEN kwh_one_year_normal=0 THEN NULL WHEN kwh_one_year_normal IS NULL THEN NULL ELSE 1000000000*(1-kwh_one_year_standard/kwh_one_year_normal) END ) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files;", engine)
     return render_template('pages/files.html', tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditAllFiles', index=False)])
 
 #-------------------------- Add File ---------------------------#
