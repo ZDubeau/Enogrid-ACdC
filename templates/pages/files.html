@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block page %}
+<div class="card-header"
+    style="background-color: rgb(167, 145, 189); color: black; border-radius: 4px 4px 0px 0px; font-size: large; font-weight: bold;">
+    Tous les fichiers
+</div>
+<div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+    <div class="table-responsive">
+        {% for table in tables_files %}
+        {{ table|safe }}
+        {% endfor %}
+    </div>
+</div>
+{% endblock page %}

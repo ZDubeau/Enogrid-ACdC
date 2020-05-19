@@ -17,6 +17,11 @@
 </p>
 <form action="/file_add" method="post" enctype=multipart/form-data>
     <div class="form-row align-items-center">
+        <div class="col-auto">
+            <input type="text" name="file_name" class="form-control mb-2 mr-sm-2"
+                style="width: 80%;transform: translate(0px, 4px);" id="inlineFormInpuFile" placeholder="Nom du fichier"
+                required>
+        </div>
         <div class="custom-file">
             <input type="file" name="file" class="custom-file-input" id="validatedCustomFile" required>
             <label class="custom-file-label" for="validatedCustomFile">Choississez votre
