@@ -4,13 +4,14 @@ import datetime
 
 def kwh_on_normalize_df(df: pd.DataFrame):
     # for remove 29 February
-    df.loc[~(df['date_time'].dt.month.eq(2) & df['date_time'].dt.day.eq(29))]
+    df = df.loc[~(df['date_time'].dt.month.eq(
+        2) & df['date_time'].dt.day.eq(29))].copy()
     df.sort_values(by=['date_time'], inplace=True)
     df.reset_index(inplace=True, drop=True)
     start = df['date_time'][0]
     end = df['date_time'][len(df)-1]
     Total = 0
-
+    # Calculate delta
     if start.year == end.year:
         Total += df['kwh'].sum()
     elif end < datetime.datetime(year=end.year, month=start.month, day=start.day, hour=start.hour, minute=start.minute, second=start.second):

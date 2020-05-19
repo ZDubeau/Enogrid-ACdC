@@ -12,9 +12,11 @@ import protocole_DB
 full_actions_list = (definition_tables.drop_project_analyse,
                      definition_tables.drop_files,
                      definition_tables.drop_result,
+                     definition_tables.drop_normalisation,
                      definition_tables.project_analyse,
                      definition_tables.files,
-                     definition_tables.result)
+                     definition_tables.result,
+                     definition_tables.normalisation)
 
 if __name__ == "__main__":
     conn, cur = protocole_DB.ConnexionDB()

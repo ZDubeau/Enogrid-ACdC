@@ -17,7 +17,5 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: "pgadmin"
       PGADMIN_DEFAULT_PASSWORD: "pgadmin"
-#   volumes:
-#     - "./data/pgadmin:/var/lib/pgadmin"
     ports:
       - "8080:80"

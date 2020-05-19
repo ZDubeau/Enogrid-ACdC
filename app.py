@@ -90,7 +90,7 @@ def get_homepage():
     DeconnexionDB(conn, cur)
     return render_template('homepage.html', nb_projects=nb_projects, avg_files=avg_files, avg_time_10000=avg_time_10000, categories=categories, data_norm=data_norm, data_stand=data_stand)
 
-#------------------------- Projects Analyses --------------------------#
+#---------------------- Projects Analyses ----------------------#
 
 
 @app.route('/projects_analyse', methods=['GET'])
@@ -103,7 +103,7 @@ def get_projects_analyse():
     df = pd.read_sql(td.select_project_analyse_all, engine)
     return render_template('pages/projects_analyse.html', tables=[df.to_html(classes='table table-bordered', table_id='dataTableProject', index=False)], errorMessage=errorMessage,)
 
-#-------------------------- Add new Project ---------------------------#
+#---------------------- Add new Project ------------------------#
 
 
 @app.route("/project_new", methods=["POST"])
@@ -115,7 +115,7 @@ def post_project_new():
     DeconnexionDB(conn, cur)
     return redirect(url_for("get_projects_analyse", errorMessage="Nouveau projet créé !!"))
 
-#--------------------------- Edit Project -----------------------------#
+#------------------------ Edit Project -------------------------#
 
 
 @app.route('/project_edit/<id>', methods=['GET'])
@@ -133,7 +133,7 @@ def get_project_edit(id):
         f"SELECT id_f as id_file, id_pa as id_projet,file_name as Name, status, template, file_type as type, number_line as longueur, normalisation_duration as normalisation, standardisation_duration as standardisation,'' as télécharger, '' supprimer FROM files WHERE id_pa={id};", engine)
     return render_template('pages/project_edit.html', project_name=project_name, tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditFiles', index=False)], errorMessage=errorMessage, id_pa=id)
 
-#------------------------ Download Files for Project---------------------------#
+#---------------- Download Files for Project --------------------#
 
 
 @app.route('/download_files/<id>', methods=['GET'])
@@ -158,8 +158,6 @@ def get_download_files(id):
             zip_info.compress_type = zipfile.ZIP_DEFLATED
             for file in files:
                 zip_file.write(os.path.join(root, file), file)
-                # with open(os.path.join(root, file), 'rb') as fd:
-                #     zip_file.writestr(zip_info, fd.read())
                 os.remove(os.path.join(root, file))
     fileobj.seek(0)
 
@@ -194,7 +192,7 @@ def get_delete_file(id):
     DeconnexionDB(conn, cur)
     return redirect(url_for("get_project_edit", errorMessage="Le fichier et ses résultats ont bien été supprimé !", id=id_pa))
 
-#------------------------ Download File---------------------------#
+#--------------------- Download File ---------------------------#
 
 
 @app.route('/download_file/<id>', methods=['GET'])
@@ -204,6 +202,19 @@ def get_download_file(id):
         f'SELECT date_time, kwh FROM result WHERE id_f={id} ORDER BY date_time ASC;', engine)
     resp = make_response(df_file_result.to_csv())
     resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    resp.headers["Content-Type"] = "text/csv"
+    return resp
+
+#---------------- Download File - Normalisé --------------------#
+
+
+@app.route('/download_file_normalise/<id>', methods=['GET'])
+def get_download_file_normalise(id):
+    engine = make_engine()
+    df_file_result = pd.read_sql(
+        f'SELECT date_time, kwh FROM normalisation WHERE id_f={id} ORDER BY date_time ASC;', engine)
+    resp = make_response(df_file_result.to_csv())
+    resp.headers["Content-Disposition"] = "attachment; filename=export_normalise.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp
 
@@ -217,7 +228,7 @@ def get_files():
         "SELECT id_f as id_file, id_pa as id_projet, file_name as name, template, kwh_one_year_normal as kwh_normalisé, kwh_one_year_standard as kwh_standardisé,(CASE WHEN kwh_one_year_normal=0 THEN NULL WHEN kwh_one_year_normal IS NULL THEN NULL ELSE round(1000000*(1-kwh_one_year_standard/kwh_one_year_normal)) END ) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files;", engine)
     return render_template('pages/files.html', tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditAllFiles', index=False)])
 
-#---------------------------------------------------------------#
+#-------------------------- Add File ---------------------------#
 
 
 @app.route('/file_add', methods=['POST'])
@@ -311,7 +322,6 @@ def file_treatment(id, dfjson, dispatching_info: str):
         dataframe['id_f'] = id
         dataframe.to_sql('normalisation', con=engine,
                          index=False, if_exists='append')
-        Commit(conn)
         kwh_one_year_normal = round(
             validation.kwh_on_normalize_df(dataframe), 1)
         kwh_one_year_standard = round(df_result['kwh'].sum(), 1)

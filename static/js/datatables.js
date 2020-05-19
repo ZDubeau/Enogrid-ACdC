@@ -22,8 +22,18 @@ $(document).ready(function () {
       { "width": "25px", "targets": 7 },
       { "width": "25px", "targets": 8 },
     ],
+    "columns": [
+      { title: "" },
+      { title: "Nom" },
+      { title: "Nb production" },
+      { title: "Nb consommation" },
+      { title: "Editer" },
+      { title: "Statut" },
+      { title: "Afficher" },
+      { title: "Télécharger" },
+      { title: "Supprimer" }
+    ],
     "order": [[0, "desc"]],
-
     "fnRowCallback": function (nRow, aData) {
       var status = Math.round(aData[5]);
       switch (status) {
@@ -94,6 +104,19 @@ $(document).ready(function () {
       { "width": "35px", "targets": 9 },
       { "width": "30px", "targets": 10 }
     ],
+    "columns": [
+      { title: "" },
+      { title: "" },
+      { title: "Nom" },
+      { title: "Statut" },
+      { title: "Template" },
+      { title: "Type" },
+      { title: "Longueur" },
+      { title: "Normalisation" },
+      { title: "Standardisation" },
+      { title: "Télécharger" },
+      { title: "Supprimer" }
+    ],
     "order": [[0, "desc"]],
     "fnRowCallback": function (nRow, aData) {
       var id = aData[0];
@@ -130,7 +153,7 @@ $(document).ready(function () {
     "columns": [
       { title: "" },
       { title: "" },
-      { title: "Name" },
+      { title: "Nom" },
       { title: "Type" },
       { title: "kWh_normalisé" },
       { title: "kWh_standardisé" },
@@ -149,9 +172,10 @@ $(document).ready(function () {
           ppm = Math.round(ppm, 0);
           $('td:eq(4)', nRow).html(ppm);
       }
+      var id = aData[0];
       $('td:eq(5)', nRow).html(download);
       $('td:eq(5)', nRow).click(function () {
-        window.location.href = '/download_file/' + id;
+        window.location.href = '/download_file_normalise/' + id;
       });
       $('td:eq(6)', nRow).html(download);
       $('td:eq(6)', nRow).click(function () {

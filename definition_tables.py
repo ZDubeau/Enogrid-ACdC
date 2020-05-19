@@ -115,7 +115,7 @@ delete_files = """
               WHERE id_f=%(id_f)s;
               """
 
-#################### Table resultat ######################
+#------------------- Table resultat ---------------------#
 
 drop_result = """
               DROP TABLE IF EXISTS result CASCADE;

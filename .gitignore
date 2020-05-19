@@ -7,3 +7,4 @@ readme.md
 .env
 .gitter-env
 .ipynb_checkpoints/
+info_connection.json
