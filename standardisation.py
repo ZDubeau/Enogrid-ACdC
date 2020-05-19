@@ -59,11 +59,11 @@ def calcul_period_consumption(start_year, end_year, day, month, hour, minutes, d
     if len(in_period_entry) == 0:
         consumption = 0.0
         if len(just_after_period_entry) > 0:
+            previous_consumption_on_period = previous_empty_periods_comsumption / \
+                len(just_after_period_entry)
             for values in just_after_period_entry:
                 entry_date = datetime.datetime(
                     values['date_time'].year, month, day, hour, minutes)
-                previous_consumption_on_period = previous_empty_periods_comsumption / \
-                    len(just_after_period_entry)
                 consumption += (values['kwh']-previous_consumption_on_period)/(
                     (values['date_time']-entry_date).total_seconds()/60)*30.0
             previous_empty_periods_comsumption += consumption / \

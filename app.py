@@ -16,6 +16,7 @@ import protocole_DB
 from protocole_DB import ConnexionDB, DeconnexionDB, make_engine, Execute_SQL, Commit
 import definition_tables as td
 import identification
+import validation
 from celery.signals import worker_process_init
 from multiprocessing import current_process
 from pathlib import Path
@@ -31,7 +32,7 @@ r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
 UPLOAD_FOLDER = 'tmp'
 RESULT_FOLDER = 'tmp/result'
 DOWNLOAD_FOLDER = 'tmp/download'
-ALLOWED_EXTENSIONS = {'csv', 'xlsx'}
+ALLOWED_EXTENSIONS = {'csv', 'xlsx', 'xls'}
 
 app = Flask(__name__)
 
@@ -51,11 +52,12 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
+#---------------------------------------------------------------#
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 #-------------------------- Homepage ---------------------------#
 
@@ -71,22 +73,24 @@ def get_homepage():
     data_norm = list()
     data_stand = list()
     if nb_projects > 0:
-        Execute_SQL(cur, f'SELECT count(id_f) FROM files')
+        Execute_SQL(
+            cur, f"SELECT count(id_f) FROM files WHERE status='Analysé'")
         avg_files = round(cur.fetchone()[0]/nb_projects, 1)
-        Execute_SQL(cur, "SELECT sum(number_line) AS lines, (sum(normalisation_duration)+sum(standardisation_duration)) AS total_time FROM files WHERE files.status='Analysé'")
-        data = cur.fetchone()
-        avg_time_10000 = int(round(
-            10000*data[1].total_seconds()/float(data[0]), 0))
-        Execute_SQL(cur, "SELECT template, sum(number_line) AS lines, sum(normalisation_duration) AS norm, sum(standardisation_duration) AS stand FROM files WHERE files.status='Analysé' GROUP BY template ORDER BY template ASC")
-        for row in cur.fetchall():
-            categories.append(row[0])
-            lines = float(row[1])
-            data_norm.append(10000*row[2].total_seconds()/lines)
-            data_stand.append(10000*row[3].total_seconds()/lines)
+        if avg_files > 0:
+            Execute_SQL(cur, "SELECT sum(number_line) AS lines, (sum(normalisation_duration)+sum(standardisation_duration)) AS total_time FROM files WHERE files.status='Analysé'")
+            data = cur.fetchone()
+            avg_time_10000 = int(round(
+                10000*data[1].total_seconds()/float(data[0]), 0))
+            Execute_SQL(cur, "SELECT template, sum(number_line) AS lines, sum(normalisation_duration) AS norm, sum(standardisation_duration) AS stand FROM files WHERE files.status='Analysé' GROUP BY template ORDER BY template ASC")
+            for row in cur.fetchall():
+                categories.append(row[0])
+                lines = float(row[1])
+                data_norm.append(10000*row[2].total_seconds()/lines)
+                data_stand.append(10000*row[3].total_seconds()/lines)
     DeconnexionDB(conn, cur)
     return render_template('homepage.html', nb_projects=nb_projects, avg_files=avg_files, avg_time_10000=avg_time_10000, categories=categories, data_norm=data_norm, data_stand=data_stand)
 
-#-------------------------- Projects Analyses ---------------------------#
+#------------------------- Projects Analyses --------------------------#
 
 
 @app.route('/projects_analyse', methods=['GET'])
@@ -99,6 +103,8 @@ def get_projects_analyse():
     df = pd.read_sql(td.select_project_analyse_all, engine)
     return render_template('pages/projects_analyse.html', tables=[df.to_html(classes='table table-bordered', table_id='dataTableProject', index=False)], errorMessage=errorMessage,)
 
+#-------------------------- Add new Project ---------------------------#
+
 
 @app.route("/project_new", methods=["POST"])
 def post_project_new():
@@ -109,8 +115,8 @@ def post_project_new():
     DeconnexionDB(conn, cur)
     return redirect(url_for("get_projects_analyse", errorMessage="Nouveau projet créé !!"))
 
+#--------------------------- Edit Project -----------------------------#
 
-#----------------------- Edit Project -------------------------#
 
 @app.route('/project_edit/<id>', methods=['GET'])
 def get_project_edit(id):
@@ -124,7 +130,7 @@ def get_project_edit(id):
     DeconnexionDB(conn, cur)
     engine = make_engine()
     df_files = pd.read_sql(
-        f"SELECT id_f as id_file, id_pa as id_projet,status, template, file_type as type, number_line as longueur, normalisation_duration as normalisation, standardisation_duration as standardisation,'' as télécharger, '' supprimer FROM files WHERE id_pa={id};", engine)
+        f"SELECT id_f as id_file, id_pa as id_projet,file_name as Name, status, template, file_type as type, number_line as longueur, normalisation_duration as normalisation, standardisation_duration as standardisation,'' as télécharger, '' supprimer FROM files WHERE id_pa={id};", engine)
     return render_template('pages/project_edit.html', project_name=project_name, tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditFiles', index=False)], errorMessage=errorMessage, id_pa=id)
 
 #------------------------ Download Files for Project---------------------------#
@@ -163,8 +169,7 @@ def get_download_files(id):
                          filename=f'files_for_project_{id}.zip')
     return response
 
-
-#------------------------ Remove Project---------------------------#
+#----------------------- Remove Project-------------------------#
 
 
 @app.route('/project_delete/<id>', methods=['GET'])
@@ -175,8 +180,8 @@ def get_project_delete(id):
     DeconnexionDB(conn, cur)
     return redirect(url_for("get_projects_analyse", errorMessage="Le projet et tout les contenus ont bien été supprimé !"))
 
-
 #------------------------ Remove File---------------------------#
+
 
 @app.route('/delete_file/<id>', methods=['GET'])
 def get_delete_file(id):
@@ -205,18 +210,12 @@ def get_download_file(id):
 #--------------------------- Files -----------------------------#
 
 
-# @app.route('/files', methods=['GET'])
-# def get_files():
-#     conn, cur = ConnexionDB()
-#     Execute_SQL(cur, "SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'consommation' AND id_pa=1) GROUP BY month ORDER BY month;")
-#     consommation_data = list()
-#     for row in cur.fetchall():
-#         consommation_data.append(row[1])
-#     Execute_SQL(cur, "SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'production' AND id_pa=1) GROUP BY month ORDER BY month;")
-#     production_data = list()
-#     for row in cur.fetchall():
-#         production_data.append(row[1])
-#     return render_template('pages/files.html', consommation_data=consommation_data, production_data=production_data)
+@app.route('/files', methods=['GET'])
+def get_files():
+    engine = make_engine()
+    df_files = pd.read_sql(
+        "SELECT id_f as id_file, id_pa as id_projet, file_name as name, template, kwh_one_year_normal as kwh_normalisé, kwh_one_year_standard as kwh_standardisé,(CASE WHEN kwh_one_year_normal=0 THEN NULL WHEN kwh_one_year_normal IS NULL THEN NULL ELSE round(1000000*(1-kwh_one_year_standard/kwh_one_year_normal)) END ) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files;", engine)
+    return render_template('pages/files.html', tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditAllFiles', index=False)])
 
 #---------------------------------------------------------------#
 
@@ -226,14 +225,11 @@ def get_file_add():
     conn, cur = ConnexionDB()
     file = request.files['file']
     id_pa = request.form["id_pa"]
+    file_name = request.form['file_name']
     if file and allowed_file(file.filename):
         file_type = request.form["file_type"]
-        if "supprimer_zero" in request.form:
-            supprimer_zero = True
-        else:
-            supprimer_zero = False
         Execute_SQL(cur, td.insert_files, {
-            'id_pa': id_pa, 'file_type': file_type, 'suppression_zero': supprimer_zero})
+            'id_pa': id_pa, 'file_name': file_name, 'file_type': file_type})
         Commit(conn)
         id_f = cur.fetchone()[0]
         filename = os.path.join(
@@ -254,8 +250,8 @@ def get_file_add():
     os.remove(filename)
     return redirect(url_for("get_project_edit", id=id_pa, errorMessage=errorMessage))
 
-
 #-------------------------- Graph ------------------------------#
+
 
 @app.route('/graph/<id>', methods=['GET', 'POST'])
 def get_graph(id):
@@ -281,7 +277,7 @@ def get_graph(id):
     name_pa = cur.fetchone()[0]
     return render_template('pages/graph.html', projet=name_pa, consommation_data=consommation_data, production_data=production_data, surplus_data=surplus_data)
 
-#---------------------- Documentation / help --------------------------#
+#---------------------- Documentation / help ------------------------#
 
 
 @app.route('/documentation', methods=['GET'])
@@ -294,10 +290,9 @@ def get_help():
     return render_template('pages/help.html')
 
 
-#---------------------------------------------------#
-#                    Celery Tasks                   #
-#---------------------------------------------------#
-
+#--------------------------------------------------------------------#
+#                            Celery Tasks                            #
+#--------------------------------------------------------------------#
 
 @celery.task
 def file_treatment(id, dfjson, dispatching_info: str):
@@ -306,23 +301,22 @@ def file_treatment(id, dfjson, dispatching_info: str):
         conn, cur = ConnexionDB()
         engine = make_engine()
         Execute_SQL(cur, td.update_files_in_progress, {'id_f': id})
-        df = pd.read_json(dfjson, typ='frame', orient='table')
-        # Path(os.path.join(
-        #     os.getcwd(), app.config['RESULT_FOLDER'])).mkdir(parents=True, exist_ok=True)
-        # df.to_csv(os.path.join(
-        #     os.getcwd(), app.config['RESULT_FOLDER'], f'fichier_base_{id}.csv'))
+        df = pd.read_json(dfjson, typ='frame', orient='table',
+                          convert_dates=False, convert_axes=False)
         Commit(conn)
         file_type, identification_duration, preparation_duration, normalisation_duration, standardisation_duration, dataframe, df_result = identification.identification_normalisation_standardisation(
             df, dispatching_info, start_date, "web")
         df_result['id_f'] = id
         df_result.to_sql('result', con=engine, index=False, if_exists='append')
+        dataframe['id_f'] = id
+        dataframe.to_sql('normalisation', con=engine,
+                         index=False, if_exists='append')
         Commit(conn)
-        # dataframe.to_csv(os.path.join(
-        #     os.getcwd(), app.config['RESULT_FOLDER'], f'result_normalisation_{id}.csv'))
-        # df_result.to_csv(os.path.join(
-        #     os.getcwd(), app.config['RESULT_FOLDER'], f'result_{id}.csv'))
+        kwh_one_year_normal = round(
+            validation.kwh_on_normalize_df(dataframe), 1)
+        kwh_one_year_standard = round(df_result['kwh'].sum(), 1)
         Execute_SQL(cur, td.update_files_done, {'id_f': id, "template": file_type, 'number_line': len(
-            dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration})
+            dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration, "kwh_one_year_normal": kwh_one_year_normal, "kwh_one_year_standard": kwh_one_year_standard})
         Commit(conn)
         DeconnexionDB(conn, cur)
     except Exception as error:
@@ -332,9 +326,9 @@ def file_treatment(id, dfjson, dispatching_info: str):
         DeconnexionDB(conn, cur)
         print(error)
 
-#---------------------------------------------------#
-#                      The End                      #
-#---------------------------------------------------#
+#------------------------------------------------------------------#
+#                            The End                               #
+#------------------------------------------------------------------#
 
 
 if __name__ == '__main__':

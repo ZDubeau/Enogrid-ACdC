@@ -14,7 +14,7 @@ def identification(file):
         with io.open(file, 'r', encoding='utf-8') as f:
             dispatching_info = str(next(csv.reader(f)))
         df = pd.read_csv(file, sep='delimiter', engine='python')
-    elif extension == 'xlsx':
+    elif extension == 'xlsx' or extension == 'xls':
         dispatching_info = str(pd.read_excel(
             file).columns.ravel().tolist())
         df = pd.read_excel(file)
@@ -43,20 +43,21 @@ def iden_norm_stand(file, origin='standalone'):
 
 def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_info, start_date, origin="standalone"):
     dispatch = {
-        "['\\ufeffdatetime;W']": nm.template1_pd,
-        "['Date;Time;W']": nm.template2_pd,
-        "['Datetime;W']": nm.template3_pd,
-        "['Datetime', 'W']": nm.template4_pd,
-        "['\\ufeffHorodate;W']": nm.template5_pd,
-        "['Datetime', 'kW']": nm.template6_pd,
-        "['Date', 'Time', 'kWh']": nm.template7_pd,
-        "['Datetime;W;W']": nm.template8_pd,
-        "['Horodate;Wh']": nm.template9_pd}
+        "['\\ufeffdatetime;W']": nm.template1,
+        "['Date;Time;W']": nm.template2,
+        "['Datetime;W']": nm.template3,
+        "['Datetime', 'W']": nm.template4,
+        "['\\ufeffHorodate;W']": nm.template5,
+        "['Datetime', 'kW']": nm.template6,
+        "['Date', 'Time', 'kWh']": nm.template7,
+        "['Datetime;W;W']": nm.template8,
+        "['Horodate;Wh']": nm.template9}
     try:
         function = dispatch[dispatching_info]
         end_identification_date = datetime.datetime.now()
         dfjson = df.to_json(orient='table')
-        df = pd.read_json(dfjson, typ='frame', orient='table')
+        df = pd.read_json(dfjson, typ='frame', orient='table',
+                          convert_dates=False, convert_axes=False)
         file_type, preparation, dataframe = function(df, origin)
         end_import_date = datetime.datetime.now()
         df_result = pd.DataFrame(columns=['date_time', 'kwh'])
@@ -73,7 +74,10 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
     except Exception as error:
         end_identification_date = datetime.datetime.now()
         traitement = end_identification_date-start_date
-        return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+        if dataframe is None:
+            return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+        else:
+            return error, traitement, traitement, traitement, traitement, dataframe, pd.DataFrame(columns=['date_time', 'kwh'])
 
 
 if __name__ == "__main__":
