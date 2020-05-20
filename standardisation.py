@@ -9,8 +9,6 @@ import queue
 
 
 # 146h on T2
-
-
 def get_correct_date(day, month, hour, minutes, dataframe):
     in_period_entry = []
     just_after_period_entry = []

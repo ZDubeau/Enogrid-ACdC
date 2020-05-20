@@ -6,6 +6,7 @@ import datetime
 import pandas as pd
 import normalisation as nm
 import standardisation as sd
+import validation as vd
 
 
 def identification(file):
@@ -81,14 +82,24 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
 
 
 if __name__ == "__main__":
-    file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
-        sys.argv[1], "web")
-    dataframe.to_csv('result_normalisation_' +
-                     str.split(sys.argv[1], '.')[1]+".csv")
-    df_result.to_csv('result_'+str.split(sys.argv[1], '.')[1]+".csv")
-    print("Fichier : ", sys.argv[1])
-    print("Template : ", file_type)
-    print("Identification :", identification)
-    print("Preparation :", preparation)
-    print("Normalisation :", normalisation)
-    print("Standardisation :", standardisation)
+    try:
+        file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
+            sys.argv[1], "standalone")
+        dataframe.to_csv('result_normalisation_' +
+                         str.split(sys.argv[1], '.')[1]+".csv")
+        df_result.to_csv('result_'+str.split(sys.argv[1], '.')[1]+".csv")
+        kwh_one_year_normal = round(
+            vd.kwh_on_normalize_df(dataframe), 1)
+        kwh_one_year_standard = round(df_result['kwh'].sum(), 1)
+        if kwh_one_year_normal == 0:
+            ppb = "Normalisation incorrecte"
+        else:
+            ppb = abs(int(
+                round(1000000000*(1-kwh_one_year_standard/kwh_one_year_standard), 0)))
+        print("Fichier : ", sys.argv[1])
+        print("Template : ", file_type)
+        print("Normalisation :", identification+preparation+normalisation)
+        print("Standardisation :", standardisation)
+        print("Part Per Billion :", ppb)
+    except Exception as error:
+        print("Traitemet impossible :", error)

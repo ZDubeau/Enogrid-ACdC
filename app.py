@@ -11,12 +11,6 @@ import os
 import pandas as pd
 from pandas import DataFrame
 from sqlalchemy import create_engine
-
-import protocole_DB
-from protocole_DB import ConnexionDB, DeconnexionDB, make_engine, Execute_SQL, Commit
-import definition_tables as td
-import identification
-import validation
 from celery.signals import worker_process_init
 from multiprocessing import current_process
 from pathlib import Path
@@ -24,6 +18,13 @@ import urllib.parse
 import zipfile
 import io
 
+# importing my functions files
+import protocole_DB
+from protocole_DB import ConnexionDB, DeconnexionDB, make_engine, Execute_SQL, Commit
+import definition_tables as td
+import identification
+import validation
+# _____________________________________________________________________________________
 
 url = urllib.parse.urlparse(os.environ.get('REDISCLOUD_URL'))
 r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
@@ -52,14 +53,14 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
-#---------------------------------------------------------------#
+#__________________________________________________________________________#
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-#-------------------------- Homepage ---------------------------#
+#______________________________ Homepage __________________________________#
 
 
 @app.route('/', methods=['GET'])
@@ -90,7 +91,7 @@ def get_homepage():
     DeconnexionDB(conn, cur)
     return render_template('homepage.html', nb_projects=nb_projects, avg_files=avg_files, avg_time_10000=avg_time_10000, categories=categories, data_norm=data_norm, data_stand=data_stand)
 
-#---------------------- Projects Analyses ----------------------#
+#____________________________ Projects Analyses _____________________________#
 
 
 @app.route('/projects_analyse', methods=['GET'])
@@ -103,7 +104,7 @@ def get_projects_analyse():
     df = pd.read_sql(td.select_project_analyse_all, engine)
     return render_template('pages/projects_analyse.html', tables=[df.to_html(classes='table table-bordered', table_id='dataTableProject', index=False)], errorMessage=errorMessage,)
 
-#---------------------- Add new Project ------------------------#
+#_____________________________ Add new Project _____________________________#
 
 
 @app.route("/project_new", methods=["POST"])
@@ -115,7 +116,7 @@ def post_project_new():
     DeconnexionDB(conn, cur)
     return redirect(url_for("get_projects_analyse", errorMessage="Nouveau projet créé !!"))
 
-#------------------------ Edit Project -------------------------#
+#______________________________ Edit Project ______________________________#
 
 
 @app.route('/project_edit/<id>', methods=['GET'])

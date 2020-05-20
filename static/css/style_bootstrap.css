@@ -153,6 +153,7 @@ sup {
 
 sub {
   bottom: -0.25em;
+  color: #d60000 !important;
 }
 
 sup {
