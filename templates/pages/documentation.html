@@ -7,6 +7,10 @@
         text-align: center !important;
         vertical-align: middle !important;
     }
+
+    #alone_e {
+        color: rgb(1, 37, 153) !important;
+    }
 </style>
 <div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
     <div class="card-header"
@@ -161,7 +165,7 @@
                                 est la somme des kWh de tout le fichier.<br>
                                 2. Sinon si D<sub>e</sub>/M<sub>e</sub>/Y<sub>e</sub>
                                 h<sub>e</sub>:m<sub>e</sub>:s<sub>e</sub>
-                                < D<sub>s</sub>/M<sub>s</sub>/Y<sub>e</sub>
+                                < D<sub>s</sub>/M<sub>s</sub>/Y<sub id="alone_e">e</sub>
                                     h<sub>s</sub>:m<sub>s</sub>:s<sub>s</sub> alors nous utilisons la formule suivante :
                                     <img src="{{ url_for('static', filename='/image/cas2.JPG') }}"
                                         class="mx-auto d-block" alt="cas_2" style="padding-top: 20px;"><br>
@@ -285,7 +289,7 @@
                     </li>
                 </ul>
                 Sinon un retour similaire à celui ci-dessous est fourni et les fichiers normalisé et standardisé
-                sont disponibles dans le respertoire du fichier intial avec un nom s'en rapprochant :
+                sont disponibles dans le répertoire du fichier intial avec un nom s'en rapprochant :
                 (result_normalisation_**.csv et result_**.csv)<br>
                 <ul class="list-group" style="padding-top: 15px;padding-bottom: 1px;">
                     <li class="text-monospace"
@@ -372,7 +376,7 @@
             </li>
             <li class="list-group-item"
                 style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
-                Le <strong>calcul matriciel</strong> afin de passer de kW en kWH dans un type de régression linéaire
+                Le <strong>calcul matriciel</strong> afin de passer de kW en kWh dans un type de régression linéaire
                 paramétré comme évoqué dans le paragraphe de la normalisation a permis de gagner un <strong>facteur
                     10</strong> dans la
                 normalisation par rapport à un parcours du tableau des données.
@@ -393,14 +397,14 @@
             <li class="list-group-item"
                 style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
                 En mode <strong>web</strong>, avec l'utilisation de <strong>Celery</strong>, le multiprocessing n'est
-                plus possible par contre nous avons eu recours à méme méthodologie avec le
+                plus possible, par contre nous avons eu recours à même méthodologie avec le
                 <strong>multithreading</strong>. Ce traitement en parallèle de données découpés avec un recouvrement
                 minimal a permis d'améliorer les performances de la normalisation et de la standardisation et de passer
                 d'un traitement de plusieurs heures à seulement quelques dizaines de secondes. Il est néanmois moins
                 performant que le multiprocessing.
             </li>
             <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
-                Récapitulatif des performances par action, et fichier d'exemples fournis
+                Récapitulatif des performances par action, et fichier d'exemples fournis :
                 <div class="card-body" style="width: 800px;margin: 0px auto;">
                     <div class="table-responsive">
                         <table class="table table-bordered">
