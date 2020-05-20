@@ -1,0 +1,507 @@
+{% extends "layout.html" %}
+
+{% block page %}
+<style>
+    td,
+    th {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
+
+    #alone_e {
+        color: rgb(1, 37, 153) !important;
+    }
+</style>
+<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
+    <div class="card-header"
+        style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);font-weight: 700;font-size: large;">
+        Traitement des données
+    </div>
+    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+        <ul class="list-group">
+            <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
+                L’analyse d’un fichier se fait en trois étapes :
+                <ul class="list-group" style="padding-top: 20px;">
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - identification
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - normalisation
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - standardisation
+                    </li>
+                </ul>
+            </li>
+            <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
+                L’<strong>identification</strong> a pour but de trouver quel est le modèle du fichier soumis.
+                L’identification se base sur l’extension du fichier et l’entête des données. Si il n’y a pas de
+                correspondance le système indique que le fichier est de type inconnu.
+                <div class="card-body" style="width: 450px;margin: 0px auto;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Format</th>
+                                    <th>Entête</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Template1</td>
+                                    <td>csv</td>
+                                    <td>['\\ufeffdatetime;W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template2</td>
+                                    <td>csv</td>
+                                    <td>['Date;Time;W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template3</td>
+                                    <td>csv</td>
+                                    <td>['Datetime;W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template4</td>
+                                    <td>xlsx</td>
+                                    <td>['Datetime', 'W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template5</td>
+                                    <td>csv</td>
+                                    <td>['\\ufeffHorodate;W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template6</td>
+                                    <td>xls</td>
+                                    <td>['Datetime', 'kW']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template7</td>
+                                    <td>xlsx</td>
+                                    <td>['Date', 'Time', 'kWh']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template8</td>
+                                    <td>csv</td>
+                                    <td>['Datetime;W;W']</td>
+                                </tr>
+                                <tr>
+                                    <td>Template9</td>
+                                    <td>csv</td>
+                                    <td>['Horodate;Wh']</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;">
+                La <strong>normalisation</strong> a pour but de traiter un fichier reconnu. 9 modèles ont été analysés
+                et sur la base de leur caractéristiques des fonctions de normalisations différentes ont été développées.
+                A la fin de la normalisation un jeu de donnée constitué d’entrées de type date avec heure et de
+                consommation en kWh sont disponibles. Le passage de W en kW se fait par une division par 1000, de Wh en
+                kWh également. Pour le passage de kW en kWh:</li>
+            <img src="{{ url_for('static', filename='/image/kWh.jpg') }}" class="mx-auto d-block"
+                alt="Responsive image">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 30px;">
+                Afin d’optimiser les performances, un calcul matriciel est utilisé et un découpage du fichier avec du
+                recouvrement est fait pour permettre des traitements en parallèle (multithreading ou multiprocessing
+                suivant les cas)
+            </li>
+            <img src="{{ url_for('static', filename='/image/matrice.JPG') }}" class="mx-auto d-block"
+                alt="Responsive image">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 30px;">
+                La <strong>standardisation</strong> consiste à faire un fichier avec une entrée toutes les 30 minutes
+                pendant 1 an soit 17520 entrées.
+                Dans le cas ou un fichier normalisé est sur moins de 365 jours la somme des kWh en entrée de
+                standardisation doit être égal à la somme des kWh du fichier en sortie de la standardisation. Pour un
+                fichier de plus de 365 jours, la somme de la moyenne des kWh par jour du fichier d’entrée (en excluant
+                le 29 février) doit être égale à la somme des kWh du fichier de sortie.
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
+    <div class="card-header"
+        style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);font-weight: 700;font-size: large;">
+        Validation des données
+    </div>
+    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+        <ul class="list-group">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 30px;padding-top: 20px;">
+                La <strong>validation</strong> des données consiste à comparer la moyenne de la somme des kWh sur un an
+                (en excluant les données du 29 Février) en fin de normalisation avec la somme des kWh en fin de
+                standardisation.<br>
+                Pour calculer la valeur annuelle moyenne dans les fichiers normalisés, les formules suivantes sont
+                utilisés en fonction ses valeurs des date de premier enregistrement et dernier enregistrement.<br>
+                <ul class="list-group" style="padding-top: 20px;">
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        * Avec date de premier enregistrement = D<sub>s</sub>/M<sub>s</sub>/Y<sub>s</sub>
+                        h<sub>s</sub>:m<sub>s</sub>:s<sub>s</sub>
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        * Avec date de dernier enregistrement = D<sub>e</sub>/M<sub>e</sub>/Y<sub>e</sub>
+                        h<sub>e</sub>:m<sub>e</sub>:s<sub>e</sub>
+                        <ul class="list-group" style="padding-top: 20px;">
+                            <li class="list-group-item"
+                                style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                                1. Si Y<sub>e</sub> = Y<sub>s</sub> alors les données
+                                sont sur 1 an
+                                et pour la valeur
+                                cherché
+                                est la somme des kWh de tout le fichier.<br>
+                                2. Sinon si D<sub>e</sub>/M<sub>e</sub>/Y<sub>e</sub>
+                                h<sub>e</sub>:m<sub>e</sub>:s<sub>e</sub>
+                                < D<sub>s</sub>/M<sub>s</sub>/Y<sub id="alone_e">e</sub>
+                                    h<sub>s</sub>:m<sub>s</sub>:s<sub>s</sub> alors nous utilisons la formule suivante :
+                                    <img src="{{ url_for('static', filename='/image/cas2.JPG') }}"
+                                        class="mx-auto d-block" alt="cas_2" style="padding-top: 20px;"><br>
+                            </li>
+                            <li class="list-group-item"
+                                style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                                3. Sinon nous utilisons la formule suivante :<br>
+                                <img src="{{ url_for('static', filename='/image/cas3.JPG') }}" class="mx-auto d-block"
+                                    alt="cas_3" style="padding-top: 20px;">
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <br>
+                L'écart entre la somme des kWh en moyenne par an du fichier normalisé et celle du fichier standardisé
+                sera exprimé en PPB (part par milliard) afin de mieux visualiser l'écart entre les données normalisés et
+                standardisés. <strong>Un PPB de 0</strong> permet de dire que le fichier standardisé reflète
+                <strong>parfaitement</strong> le fichier normalisé. <strong>Un PPB inférieur à 1000</strong> (écart de
+                moins de 0,000001%) signifie que le fichier standardisé reflète <strong>très bien</strong> le fichier
+                normalisé.<br>
+                Pour les fichiers mis à disposition à titre d'exemple les résultats furent les suivants:
+                <div class="card-body" style="width: 450px;margin: 0px auto;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Fichier</th>
+                                    <th>Modèle</th>
+                                    <th>PPB</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Template1.csv</td>
+                                    <td>Template1</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template2.csv</td>
+                                    <td>Template2</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template3.csv</td>
+                                    <td>Template3</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template4.xlsx</td>
+                                    <td>Template4</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template5.csv</td>
+                                    <td>Template5</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template6.xls</td>
+                                    <td>Template6</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template7.xlsx</td>
+                                    <td>Template7</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template8.csv</td>
+                                    <td>Template8</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>Template9.csv</td>
+                                    <td>Template9</td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
+    <div class="card-header"
+        style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);font-weight: 700;font-size: large;">
+        Utilisation
+    </div>
+    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+        <ul class="list-group">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 30px;">
+                Il est possible d'utiliser l'outil de traitement développé de deux manières:
+                <ul class="list-group" style="padding-top: 20px;">
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - directement en ligne de commande (standalone) : python identification.py nom_fichier
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - sur ce site internet (web)
+                    </li>
+                </ul>
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-top: 20px;">
+                En mode <strong>standalone</strong>, il faut lancer le module identification en ligne de commande et
+                mettre en argument le fichier à traiter. S'il n'est pas possible de traiter le fichier fourni une retour
+                du type suivant est renvoyé :<br>
+                <ul class="list-group" style="padding-top: 15px;padding-bottom: 15px;">
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        list index out of range
+                    </li>
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Traitemet impossible : list index out of range
+                    </li>
+                </ul>
+                Sinon un retour similaire à celui ci-dessous est fourni et les fichiers normalisé et standardisé
+                sont disponibles dans le répertoire du fichier intial avec un nom s'en rapprochant :
+                (result_normalisation_**.csv et result_**.csv)<br>
+                <ul class="list-group" style="padding-top: 15px;padding-bottom: 1px;">
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Fichier : **
+                    </li>
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Template : Template X
+                    </li>
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Normalisation : X:XX:XX.XXXXXX
+                    </li>
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Standardisation : Y:YY:YY.YYYYYY
+                    </li>
+                    <li class="text-monospace"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;color: rgb(2, 21, 185);padding: 0rem 1rem !important;">
+                        Part Per Billion : Z
+                    </li>
+                </ul>
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;">
+                En mode <strong>web</strong>, une interface en <strong>HTML et javascript</strong> supportée par un
+                serveur en <strong>Python</strong> avec une base de
+                données <strong>PostgreSQL</strong> permet de créer des projets, d'uploader des fichiers et de lancer
+                leur traitement
+                de manière asynchrone avec le module <strong>Celery</strong>. Le traitement des données en arrière-plan
+                utilise
+                exactement les mêmes méthodologies que le mode standalone.<br>
+                Une maquette sur heroku est disponible mais son utilisation est restreinte par la limitation à 10000
+                lignes en base de donnée du plan hobby dev.<br>
+                L'interface web graphique permet d'afficher des informations statistiques sur le nombre de projets, de
+                fichiers et les temps de traitements. Elle permet également d'aller plus loin dans le traitement des
+                données et d'avoir la représentation des consommations globales, productions globales et surplus par
+                projet et bientôt par consommateur.<br>
+                Pour le <strong>traitement des données</strong>, la représentation graphique retenue est pour un
+                intervalle de temps d'un mois. Il est tout a fait possible de faire la même chose facilement pour un
+                intervalle d'une semaine, d'un jour ou de 30 minutes.<br>
+                Pour chaque consommateur, une part de la production totale lui sera affecté au pro-rata de sa
+                consommation sur la période de temps choisie (ici le mois). Afin de pouvoir différencier les graphes
+                représentant cette consommation, production et surplus par utilisateur, un nom devra être associé à
+                chaque fichier ajouté à un projet.
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="card text-manual bg-manual mb-3" style="max-width: 68rem;">
+    <div class="card-header"
+        style="color: rgb(0, 0, 0);background-color: rgb(167, 145, 189);font-weight: 700;font-size: large;">
+        Performances
+    </div>
+    <div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+        <ul class="list-group">
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
+                Pour le traitement des données il faut être capable de traiter des fichiers de quelques centaines de
+                lignes à plusieurs dizaines de milliers de lignes dans un temps raisonnable. De plus le retour, demandé
+                sur une année par pas de 30 minutes, demande à pouvoir affecter à chacune des 17520 entrées de la table
+                des résultats la bonne valeur.<br>
+                J'ai fait le choix d'utiliser le module pandas pour sa capacité à manipuler les données et ceci malgré
+                ses limitations. Ensuite, j'ai fait les optimisations suivantes :
+                <ul class="list-group" style="padding-top: 20px;">
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - utilisation du calcul matriciel
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - utilisation des subset de pandas
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - découpage, recouvrement et multiprocessing pour la version standalone
+                    </li>
+                    <li class="list-group-item"
+                        style="background-color: #DEBDFF;border-color: #DEBDFF;padding: 0rem 1rem !important;">
+                        - découpage, recouvrement et multithreading pour la version web
+                    </li>
+                </ul>
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
+                Le <strong>calcul matriciel</strong> afin de passer de kW en kWh dans un type de régression linéaire
+                paramétré comme évoqué dans le paragraphe de la normalisation a permis de gagner un <strong>facteur
+                    10</strong> dans la
+                normalisation par rapport à un parcours du tableau des données.
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
+                L'utilisation des <strong>subset de dataframe</strong> lors de la standardisation afin d'identifier les
+                données du tableau normalisé à inclure dans l'intervalle de temps de 30 minutes de chaque ligne du
+                résultat standardisé a permis l'amélioration des performances par un <strong>facteur 100</strong> par
+                rapport à un parcours du tableau des données.
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
+                La <strong>multiprocessing</strong> et traitement en parallèle de données découpés avec un recouvrement
+                minimal ont permis d'améliorer les performances de la normalisation et de la standardisation et de
+                passer d'un traitement de plusieurs heures à seulement quelques dizaines de secondes.
+            </li>
+            <li class="list-group-item"
+                style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;padding-bottom: 20px;padding-top: 20px;">
+                En mode <strong>web</strong>, avec l'utilisation de <strong>Celery</strong>, le multiprocessing n'est
+                plus possible, par contre nous avons eu recours à même méthodologie avec le
+                <strong>multithreading</strong>. Ce traitement en parallèle de données découpés avec un recouvrement
+                minimal a permis d'améliorer les performances de la normalisation et de la standardisation et de passer
+                d'un traitement de plusieurs heures à seulement quelques dizaines de secondes. Il est néanmois moins
+                performant que le multiprocessing.
+            </li>
+            <li class="list-group-item" style="background-color: #DEBDFF;border-color: #DEBDFF;line-height: 2.0;">
+                Récapitulatif des performances par action, et fichier d'exemples fournis :
+                <div class="card-body" style="width: 800px;margin: 0px auto;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">Fichier</th>
+                                    <th rowspan="2">Nombre de Lignes</th>
+                                    <th colspan="2">Standalone</th>
+                                    <th colspan="2">Web</th>
+                                </tr>
+                                <tr>
+                                    <th>Normalisation</th>
+                                    <th>Standardisation</th>
+                                    <th>Normalisation</th>
+                                    <th>Standardisation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Template1.csv</td>
+                                    <td>8784</td>
+                                    <td>00:00:01.599598</td>
+                                    <td>00:00:22.183772</td>
+                                    <td>00:00:02.305700</td>
+                                    <td>00:02:40.750018</td>
+                                </tr>
+                                <tr>
+                                    <td>Template2.csv</td>
+                                    <td>105108</td>
+                                    <td>00:00:18.055045</td>
+                                    <td>00:01:42.401705</td>
+                                    <td>00:00:47.200715</td>
+                                    <td>00:09:21.540655</td>
+                                </tr>
+                                <tr>
+                                    <td>Template3.csv</td>
+                                    <td>52235</td>
+                                    <td>00:00:08.800843</td>
+                                    <td>00:01:08.003818</td>
+                                    <td>00:00:26.209028</td>
+                                    <td>00:06:34.567561</td>
+                                </tr>
+                                <tr>
+                                    <td>Template4.xlsx</td>
+                                    <td>102658</td>
+                                    <td>00:00:26.333030</td>
+                                    <td>00:01:48.476483</td>
+                                    <td>00:00:47.636882</td>
+                                    <td>00:07:41.962479</td>
+                                </tr>
+                                <tr>
+                                    <td>Template5.csv</td>
+                                    <td>66810</td>
+                                    <td>00:00:15.637376</td>
+                                    <td>00:01:43.077662</td>
+                                    <td>00:00:42.905490</td>
+                                    <td>00:08:03.355439</td>
+                                </tr>
+                                <tr>
+                                    <td>Template6.xls</td>
+                                    <td>8760</td>
+                                    <td>00:00:01.848925</td>
+                                    <td>00:00:25.078569</td>
+                                    <td>00:00:04.493117</td>
+                                    <td>00:02:22.579760</td>
+                                </tr>
+                                <tr>
+                                    <td>Template7.xlsx</td>
+                                    <td>8735</td>
+                                    <td>00:00:01.616906</td>
+                                    <td>00:00:37.047684</td>
+                                    <td>00:00:02.599638</td>
+                                    <td>00:02:45.214635</td>
+                                </tr>
+                                <tr>
+                                    <td>Template8.csv</td>
+                                    <td>1486</td>
+                                    <td>00:00:07.174709</td>
+                                    <td>00:00:07.166742</td>
+                                    <td>00:00:22.759630</td>
+                                    <td>00:00:42.848418</td>
+                                </tr>
+                                <tr>
+                                    <td>Template9.csv</td>
+                                    <td>35040</td>
+                                    <td>00:00:01.845784</td>
+                                    <td>00:01:17.156428</td>
+                                    <td>00:00:04.786588</td>
+                                    <td>00:03:21.987484</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock page %}

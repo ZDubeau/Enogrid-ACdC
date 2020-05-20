@@ -1,0 +1,27 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+jupyterlab = "*"
+xlrd = "*"
+numpy = "*"
+pandas = "*"
+flask = "*"
+flask-restful = "*"
+sqlalchemy = "*"
+psycopg2 = "*"
+python-dotenv = "*"
+jinja2 = "*"
+psycopg2-binary = "*"
+werkzeug = "*"
+celery = {extras = ["redis"],version = "*"}
+redis = "*"
+gunicorn = "*"
+billiard = "*"
+
+[requires]
+python_version = "3.8"

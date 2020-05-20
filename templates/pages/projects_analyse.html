@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block page %}
+<div class="card-header"
+    style="background-color: rgb(167, 145, 189); color: black; border-radius: 4px 4px 0px 0px; font-size: large; font-weight: bold;">
+    Tous les projets
+</div>
+<div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+    <div class="table-responsive">
+        {% for table in tables %}
+        {{ table|safe }}
+        {% endfor %}
+    </div>
+</div>
+<form id="app" class="form-inline" action="/project_new" method="post">
+    <div class="column is-half is-offset-one-quarter"
+        style="transform: translate(-280px, 0px);padding-bottom: 20px;padding-top: 50px;">
+        <p class="title" style="color: #DEBCFF !important;font-size:large;">Créer un projet d'analyse de courbe de
+            charge</p>
+    </div>
+    <div>
+        <input type="text" name="project_name" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2"
+            placeholder="Nom de projet" required>
+        <button type="submit" class="btn btn-primary mb-2">Envoyer</button>
+    </div>
+</form>
+<h3 style="color: khaki;padding-top: 25px;">{{errorMessage}}</h3>
+{% endblock page %}

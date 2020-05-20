@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block page %}
+<div class="card-header"
+    style="background-color: rgb(167, 145, 189); color: black; border-radius: 4px 4px 0px 0px; font-size: large; font-weight: bold;">
+    {{project_name}}
+</div>
+<div class="card-body" style="border-radius: 0px 0px 4px 4px;">
+    <div class="table-responsive">
+        {% for table in tables_files %}
+        {{ table|safe }}
+        {% endfor %}
+    </div>
+</div>
+<p class="title" style="color: #DEBDFF;padding-bottom: 10px; padding-top: 25px;font-size:larger;">Ajouter un
+    fichier au projet
+</p>
+<form action="/file_add" method="post" enctype=multipart/form-data>
+    <div class="form-row align-items-center">
+        <div class="custom-file" style="width: 45% !important;padding-right: 0px !important;">
+            <input type="file" name="file" class="custom-file-input" id="validatedCustomFile" required>
+            <label class="custom-file-label" for="validatedCustomFile">Choississez votre
+                fichier</label>
+        </div>
+        <div class="col-auto">
+            <select class="custom-select" style="width: 110%;transform: translate(-150px, 0px);" name="file_type"
+                required>
+                <option value="">Type de fichier</option>
+                <option value="consommation">Consommation</option>
+                <option value="production">Production</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <div class="form-check mb-2">
+                <label class="label" style="color: #DEBDFF;padding-top: 25px;transform: translate(-110px, 0px);">
+                    <input name="supprimer_zero" type="checkbox">
+                    &nbsp;&nbsp;Supprimer valeurs nulles initiales et finales
+                </label>
+            </div>
+        </div>
+        <div class="control" style="padding-top: 35px;">
+            <input name="id_pa" value="{{id_pa}}" type="hidden">
+            <button type="submit" class="button is-link">Envoyer</button>
+        </div>
+    </div>
+</form>
+<h2 style="color: khaki;">{{errorMessage}}</h2>
+{% endblock page %}

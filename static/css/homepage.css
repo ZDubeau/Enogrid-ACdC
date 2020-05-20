@@ -1,0 +1,208 @@
+/* ----------------------la page d'acceuil-------------------------  */
+/* ------------------------Fait par Zahra----------------------------- */
+body {
+    font-family: Roboto,"Helvetica Neue",sans-serif;
+
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: url(/static/image/cooltogo.jpg) center bottom/cover no-repeat fixed;
+    position: fixed;
+}
+/* ------------------------------------------------------------------ */
+form {
+    background-color: white;
+    width: 35%;
+    border-radius: 4px;
+    margin: auto;
+    padding: 15px;
+    transform: translate(0px, -13px);
+}
+/* ------------------------------------------------------------------- */
+h2 {
+    font-size: 17px;
+    margin-bottom: 30px;
+}
+/* ----------les boutons de l'utilisateur et son mot de pass---------- */
+input[type=text], input[type=password], input[type=psw-repeat] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    background-color: lightgray;
+    border-radius: 4px;
+}
+/* --------------------------------------------------------------------- */
+/* Select items */
+select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    font-display: swap;
+    border-radius: 5px;
+}
+/* -------------------------------------------------------------------- */
+h2 {
+    text-align: center;
+}
+#forme {
+    font-size: 14px;
+}
+
+/* -----------Set un style pour tous les boutons-------------- */
+button {
+    background: #8B42E9;
+    background: -moz-linear-gradient(left, #8B42E9 0%, #814ACB 77%, #8B42E9 100%);
+    background: -webkit-linear-gradient(left, #8B42E9 0%, #814ACB 77%, #8B42E9 100%);
+    background: linear-gradient(to right, #8B42E9 0%, #814ACB 77%, #8B42E9 100%);
+    color: white;
+    padding: 14px 20px;
+    margin: 28px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 18px;
+
+    /* margin-top: 1cm; */
+}
+/* ---------------------------------------------------------------------- */
+/* Extra styles for the cancel button */
+.cancelbtn {
+    background: #FF1D1D;
+    background: -moz-linear-gradient(left, #FF1D1D 0%, #FF040E 50%, #E2031D 100%);
+    background: -webkit-linear-gradient(left, #FF1D1D 0%, #FF040E 50%, #E2031D 100%);
+    background: linear-gradient(to right, #FF1D1D 0%, #FF040E 50%, #E2031D 100%);
+    width: auto;
+    padding: 10px 18px;
+}
+/* ----------------------------------------------------------- */
+button:hover {
+    opacity: 0.8;
+}
+/* ----------------------------------------------------------- */
+.logcontainer .inscontainer {
+    text-align: center;
+}
+/* ----------------------------------------------------------- */
+img.log, img.insc {
+    width: 40%;
+    border-radius: 50%;
+}
+/* ----------------------------------------------------------- */
+/* Add padding to container elements */
+.container {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.container-admin {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+/* ----------------------------------------------------------- */
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+/* ----------------------------------------------------------- */
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 55px;
+}
+/* ----------------------------------------------------------- */
+.modal-content {
+    background-color: #fefefe;
+    width: 26%;
+    border-radius: 7px;
+}
+.modal-content {
+    
+    border-radius: 5px;
+}
+/* ------------------------------------------------------------ */
+/* The Close Button (x) */
+.close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+}
+/* ------------------------------------------------------------ */
+#LogIn {
+    height: 50px;
+    width : 120px;
+    text-align: center;
+}
+
+#SignUp {
+    height: 50px;
+    width : 120px;
+    text-align: center;
+}
+/* --------------------------------------------------------------- */
+.close:hover,
+    .close:focus {
+    color: red;
+    cursor: pointer;
+}
+/* ---------------------------------------------------------------- */
+.content {
+    position: fixed;
+    color:#01289f;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 20px;
+    transform: translate(-30px, 10px);
+    padding: 12px;
+    font-weight: 300;
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+}
+/* ---------------------------------------------------------------- */
+
+/* Add Zoom Animation */
+.animate {
+-webkit-animation: animatezoom 0.6s;
+animation: animatezoom 0.6s
+}
+    
+@-webkit-keyframes animatezoom {
+from {-webkit-transform: scale(0)} 
+to {-webkit-transform: scale(1)}
+}
+    
+@keyframes animatezoom {
+from {transform: scale(0)} 
+to {transform: scale(1)}
+}
+    
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+span.psw {
+    display: block;
+    float: none;
+}
+.cancelbtn {
+    width: 100%;
+}
+}
+/* --------------------------------------------------------------- */  

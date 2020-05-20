@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link href="{{ url_for('static', filename='/css/style_bootstrap.css') }}" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet"
+        crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/fixedheader/3.1.2/css/fixedHeader.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+
+<body>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <!-- ----------------------------------------------------------------- -->
+                        <div class="sb-sidenav-menu-heading"></div>
+                        <a class="nav-link" href="{{ url_for('get_homepage')}}">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            Accueil
+                        </a>
+                        <a class="nav-link" href="{{ url_for('get_projects_analyse')}}">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            Projets d'Analyse
+                        </a>
+                        <!-- ----------------------------------------------------------------- -->
+                        <a class="nav-link" href="{{ url_for('get_files')}}">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            Fichiers
+                        </a>
+                        <!-- ----------------------------------------------------------------- -->
+                        <a class="nav-link" href="{{ url_for('get_help')}}">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-info"></i>
+                            </div>
+                            Aide d'utilisateur
+                        </a>
+                        <!-- ------------------------------------------------------------------ -->
+                        <a class="nav-link" href="{{ url_for('get_documentation')}}">
+                            <div class="sb-nav-link-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            Documentation
+                        </a>
+                        <!-- ------------------------------------------------------------------ -->
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <!-- --------------------------------------------------------------------------------- -->
+        <div id="layoutSidenav_content">
+            <main style="background-color: #352D3D !important;">
+                <div class="container-fluid">
+                    <br>
+                    {% block page %}
+
+                    {% endblock page %}
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted" style="transform: translate(880px, 0px);">Copyright &copy; Enorgid april
+                            2020</div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <!-- ---------------------------------------------------------------------------------- -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.1.2/js/dataTables.fixedHeader.min.js"
+        type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/3.3.0/js/dataTables.fixedColumns.min.js"
+        type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='/js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', filename='/js/datatables.js') }}"></script>
+</body>
+
+</html>
