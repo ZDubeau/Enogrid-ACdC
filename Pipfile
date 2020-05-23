@@ -22,6 +22,9 @@ celery = {extras = ["redis"],version = "*"}
 redis = "*"
 gunicorn = "*"
 billiard = "*"
+pytest = "*"
+pytest-postgresql = "*"
+openpyxl = "*"
 
 [requires]
 python_version = "3.8"
