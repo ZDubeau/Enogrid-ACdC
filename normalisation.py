@@ -136,6 +136,28 @@ def kW_kWh_multi_threaded(df):
                 y += step
                 t.start()
                 threads_list.append(t)
+            if step == (x-y+2*recovery):
+                if x-y == step:
+                    t = Thread(target=lambda q, arg: q.put(kW_kWh_optimized(
+                        arg)), args=(que, df[y-4*recovery:]), daemon=True)
+                    last_step_len = x-y+4*recovery
+                    multiplier = 3
+                else:
+                    t = Thread(target=lambda q, arg: q.put(kW_kWh_optimized(
+                        arg)), args=(que, df[y-3*recovery:]), daemon=True)
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+            else:
+                if x-y == step:
+                    t = Thread(target=lambda q, arg: q.put(kW_kWh_optimized(
+                        arg)), args=(que, df[y-3*recovery:]), daemon=True)
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+                else:
+                    t = Thread(target=lambda q, arg: q.put(kW_kWh_optimized(
+                        arg)), args=(que, df[y-2*recovery:]), daemon=True)
+                    last_step_len = x-y+2*recovery
+                    multiplier = 1
             t = Thread(target=lambda q, arg: q.put(kW_kWh_optimized(
                 arg)), args=(que, df[y-2*recovery:]), daemon=True)
             t.start()
@@ -145,8 +167,8 @@ def kW_kWh_multi_threaded(df):
                 df_mt = que.get()
                 if len(df_mt) == step:
                     df_result = df_result.append(df_mt[0:step-recovery])
-                elif len(df_mt) == (x-y+2*recovery):
-                    df_result = df_result.append(df_mt[recovery:])
+                elif len(df_mt) == last_step_len:
+                    df_result = df_result.append(df_mt[multiplier*recovery:])
                 else:
                     df_result = df_result.append(
                         df_mt[recovery:step+recovery])
@@ -180,8 +202,28 @@ def kW_kWh_multi_processed(df):
                 y += step
                 p.start()
                 process_list.append(p)
-            p = Process(target=kW_kWh_optimized_for_mp, args=(
-                df[y-2*recovery:], len(process_list), return_dict))
+            if step == (x-y+2*recovery):
+                if x-y == step+recovery:
+                    p = Process(target=kW_kWh_optimized_for_mp, args=(
+                        df[y-4*recovery:], len(process_list), return_dict))
+                    last_step_len = x-y+4*recovery
+                    multiplier = 3
+                else:
+                    p = Process(target=kW_kWh_optimized_for_mp, args=(
+                        df[y-3*recovery:], len(process_list), return_dict))
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+            else:
+                if x-y == step:
+                    p = Process(target=kW_kWh_optimized_for_mp, args=(
+                        df[y-3*recovery:], len(process_list), return_dict))
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+                else:
+                    p = Process(target=kW_kWh_optimized_for_mp, args=(
+                        df[y-2*recovery:], len(process_list), return_dict))
+                    last_step_len = x-y+2*recovery
+                    multiplier = 1
             p.start()
             process_list.append(p)
             for p in process_list:
@@ -190,8 +232,8 @@ def kW_kWh_multi_processed(df):
                 df_mt = return_dict[i]
                 if len(df_mt) == step:
                     df_result = df_result.append(df_mt[0:step-recovery])
-                elif len(df_mt) == (x-y+2*recovery):
-                    df_result = df_result.append(df_mt[recovery:])
+                elif len(df_mt) == last_step_len:
+                    df_result = df_result.append(df_mt[multiplier*recovery:])
                 else:
                     df_result = df_result.append(
                         df_mt[recovery:step+recovery])

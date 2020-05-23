@@ -1,5 +1,6 @@
 import glob
 import io
+import os
 import csv
 import sys
 import datetime
@@ -7,6 +8,7 @@ import pandas as pd
 import normalisation as nm
 import standardisation as sd
 import validation as vd
+from pathlib import Path
 
 
 def identification(file):
@@ -15,7 +17,11 @@ def identification(file):
         with io.open(file, 'r', encoding='utf-8') as f:
             dispatching_info = str(next(csv.reader(f)))
         df = pd.read_csv(file, sep='delimiter', engine='python')
-    elif extension == 'xlsx' or extension == 'xls':
+    elif extension == 'xlsx':
+        dispatching_info = str(pd.read_excel(
+            file, engine="openpyxl").columns.ravel().tolist())
+        df = pd.read_excel(file, engine="openpyxl")
+    elif extension == 'xls':
         dispatching_info = str(pd.read_excel(
             file).columns.ravel().tolist())
         df = pd.read_excel(file)
@@ -47,7 +53,7 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
         "['\\ufeffdatetime;W']": nm.template1,
         "['Date;Time;W']": nm.template2,
         "['Datetime;W']": nm.template3,
-        "['Datetime', 'W']": nm.template4,
+        "['Datetime', 'W', 'Unnamed: 2']": nm.template4,
         "['\\ufeffHorodate;W']": nm.template5,
         "['Datetime', 'kW']": nm.template6,
         "['Date', 'Time', 'kWh']": nm.template7,
@@ -85,17 +91,20 @@ if __name__ == "__main__":
     try:
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
             sys.argv[1], "standalone")
-        dataframe.to_csv('result_normalisation_' +
-                         str.split(sys.argv[1], '.')[1]+".csv")
-        df_result.to_csv('result_'+str.split(sys.argv[1], '.')[1]+".csv")
+        Path(os.path.join(
+            os.getcwd(), "result")).mkdir(parents=True, exist_ok=True)
+        dataframe.to_csv('result/result_normalisation_' +
+                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv")
+        df_result.to_csv('result/result_' +
+                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv")
         kwh_one_year_normal = round(
-            vd.kwh_on_normalize_df(dataframe), 1)
-        kwh_one_year_standard = round(df_result['kwh'].sum(), 1)
+            vd.kwh_on_normalize_df(dataframe), 2)
+        kwh_one_year_standard = round(df_result['kwh'].sum(), 2)
         if kwh_one_year_normal == 0:
             ppb = "Normalisation incorrecte"
         else:
             ppb = abs(int(
-                round(1000000000*(1-kwh_one_year_standard/kwh_one_year_standard), 0)))
+                round(1000000000*(1-kwh_one_year_standard/kwh_one_year_normal), 0)))
         print("Fichier : ", sys.argv[1])
         print("Template : ", file_type)
         print("Normalisation :", identification+preparation+normalisation)

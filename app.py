@@ -324,8 +324,8 @@ def file_treatment(id, dfjson, dispatching_info: str):
         dataframe.to_sql('normalisation', con=engine,
                          index=False, if_exists='append')
         kwh_one_year_normal = round(
-            validation.kwh_on_normalize_df(dataframe), 1)
-        kwh_one_year_standard = round(df_result['kwh'].sum(), 1)
+            validation.kwh_on_normalize_df(dataframe), 2)
+        kwh_one_year_standard = round(df_result['kwh'].sum(), 2)
         Execute_SQL(cur, td.update_files_done, {'id_f': id, "template": file_type, 'number_line': len(
             dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration, "kwh_one_year_normal": kwh_one_year_normal, "kwh_one_year_standard": kwh_one_year_standard})
         Commit(conn)
