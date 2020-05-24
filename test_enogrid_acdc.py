@@ -1,6 +1,6 @@
 import identification as ident
 import validation as valid
-import pandas
+import pandas as pd
 import datetime
 
 option = "standalone"
@@ -196,6 +196,7 @@ try:
         filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template4_copy.xlsx"
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
+        assert round(dataframe['kwh'].sum(), 5) == 0.04042
         assert dataframe['date_time'][0] == datetime.datetime(
             year=2018, month=12, day=31, hour=23, minute=57, second=0)
         assert dataframe['date_time'][len(dataframe)-1] == datetime.datetime(
@@ -210,6 +211,7 @@ try:
         filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template5_copy.csv"
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
+        assert round(dataframe['kwh'].sum(), 5) == 1892.33333
         assert dataframe['date_time'][0] == datetime.datetime(
             year=2018, month=12, day=31, hour=23, minute=0, second=0)
         assert dataframe['date_time'][len(dataframe)-1] == datetime.datetime(
