@@ -268,15 +268,19 @@ def get_file_add():
 @app.route('/graph/<id>', methods=['GET', 'POST'])
 def get_graph(id):
     conn, cur = ConnexionDB()
+    # Query permettant de récupérer la consommation mensualle pour un projet :
     Execute_SQL(
         cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'consommation' AND id_pa={id}) GROUP BY month ORDER BY month;")
+    # Initialisation de consommation par défaut :
     consommation_data = [0.0] * 12
     i = 0
     for row in cur.fetchall():
         consommation_data[i] = round(row[1], 3)
         i += 1
+    # Query permettant de récupérer la production mensualle pour un projet :
     Execute_SQL(
         cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'production' AND id_pa={id}) GROUP BY month ORDER BY month;")
+    # Initialisation de production & du surplus par défaut :
     production_data = [0.0] * 12
     surplus_data = [0.0] * 12
     i = 0
@@ -287,7 +291,72 @@ def get_graph(id):
         i += 1
     Execute_SQL(cur, f"SELECT name_pa FROM project_analyse WHERE id_pa={id}")
     name_pa = cur.fetchone()[0]
-    return render_template('pages/graph.html', projet=name_pa, consommation_data=consommation_data, production_data=production_data, surplus_data=surplus_data)
+    conn, cur = ConnexionDB()
+    # Query permettant de récupérer pour chaque fichier de consommation du projet la consommation mensualle :
+    Execute_SQL(
+        cur, f"SELECT files.id_f as id, files.file_name as file_name, extract( MONTH FROM result.date_time) as month, sum(result.kwh) as conso FROM result JOIN files ON result.id_f=files.id_f WHERE result.date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND files.file_type = 'consommation' AND files.id_pa={id} GROUP BY files.id_f, file_name,month ORDER BY files.id_f, file_name,month;")
+    actual_id_file = 0
+    result_list = list()
+    # La boucle qui permet de créer la consommation mensualle & estimer
+    # la production mensualle (prorata du % de consommation du fichier sur la consommation totale)
+    for row in cur.fetchall():
+        id_file = row[0]
+        if actual_id_file == 0:
+            actual_id_file = id_file
+            file_name = str(id_file) + " - " + row[1]
+            individual_consommation_data = [0.0] * 12
+            individual_production_data = [0.0] * 12
+            individual_surplus_data = [0.0] * 12
+            i = 0
+            period_individual_consumption = round(row[3], 3)
+            individual_consommation_data[i] = period_individual_consumption
+            if consommation_data[i] == 0:
+                individual_production_data[i] = 0
+                individual_surplus_data[i] = 0
+            else:
+                individual_production_data[i] = production_data[i] * \
+                    period_individual_consumption / consommation_data[i]
+            if (individual_consommation_data[i] < individual_production_data[i]):
+                individual_surplus_data[i] = individual_production_data[i] - \
+                    individual_consommation_data[i]
+            i += 1
+        elif id_file == actual_id_file:
+            period_individual_consumption = round(row[3], 3)
+            individual_consommation_data[i] = period_individual_consumption
+            if consommation_data[i] == 0:
+                individual_production_data[i] = 0
+                individual_surplus_data[i] = 0
+            else:
+                individual_production_data[i] = production_data[i] * \
+                    period_individual_consumption / consommation_data[i]
+            if (individual_consommation_data[i] < individual_production_data[i]):
+                individual_surplus_data[i] = individual_production_data[i] - \
+                    individual_consommation_data[i]
+            i += 1
+        else:
+            result_list.append([file_name, individual_consommation_data,
+                                individual_production_data, individual_surplus_data])
+            actual_id_file = id_file
+            file_name = str(id_file) + " - " + row[1]
+            individual_consommation_data = [0.0] * 12
+            individual_production_data = [0.0] * 12
+            individual_surplus_data = [0.0] * 12
+            i = 0
+            period_individual_consumption = round(row[3], 3)
+            individual_consommation_data[i] = period_individual_consumption
+            if consommation_data[i] == 0:
+                individual_production_data[i] = 0
+                individual_surplus_data[i] = 0
+            else:
+                individual_production_data[i] = production_data[i] * \
+                    period_individual_consumption / consommation_data[i]
+            if (individual_consommation_data[i] < individual_production_data[i]):
+                individual_surplus_data[i] = individual_production_data[i] - \
+                    individual_consommation_data[i]
+            i += 1
+    result_list.append([file_name, individual_consommation_data,
+                        individual_production_data, individual_surplus_data])
+    return render_template('pages/graph.html', projet=name_pa, consommation_data=consommation_data, production_data=production_data, surplus_data=surplus_data, result_list=result_list)
 
 #_____________________ Documentation / help _______________________#
 
@@ -324,8 +393,8 @@ def file_treatment(id, dfjson, dispatching_info: str):
         dataframe.to_sql('normalisation', con=engine,
                          index=False, if_exists='append')
         kwh_one_year_normal = round(
-            validation.kwh_on_normalize_df(dataframe), 1)
-        kwh_one_year_standard = round(df_result['kwh'].sum(), 1)
+            validation.kwh_on_normalize_df(dataframe), 2)
+        kwh_one_year_standard = round(df_result['kwh'].sum(), 2)
         Execute_SQL(cur, td.update_files_done, {'id_f': id, "template": file_type, 'number_line': len(
             dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration, "kwh_one_year_normal": kwh_one_year_normal, "kwh_one_year_standard": kwh_one_year_standard})
         Commit(conn)

@@ -38,13 +38,15 @@ def get_correct_date_optimized(start_year, end_year, day, month, hour, minutes, 
     for year in range(start_year, end_year+1):
         start_date = datetime.datetime(year, month, day, hour, minutes)
         end_date = start_date + datetime.timedelta(minutes=30)
+        end_of_year_date = datetime.datetime(year, 12, 31, 23, 59, 59)
         subset = dataframe[(dataframe.date_time >= start_date)
                            & (dataframe.date_time < end_date)]
         for index, row in subset.iterrows():
             in_period_entry.append(
                 {'date_time': row['date_time'], 'kwh': row['kwh']})
             max_index_found[year] = index
-        subset = dataframe[(dataframe.date_time >= end_date)]
+        subset = dataframe[(dataframe.date_time >= end_date) & (
+            dataframe.date_time <= end_of_year_date)]
         if not subset.empty:
             just_after_period_entry.append(
                 {'date_time': subset['date_time'].iloc[0], 'kwh': subset['kwh'].iloc[0]})
@@ -62,8 +64,8 @@ def calcul_period_consumption(start_year, end_year, day, month, hour, minutes, d
             for values in just_after_period_entry:
                 entry_date = datetime.datetime(
                     values['date_time'].year, month, day, hour, minutes)
-                consumption += (values['kwh']-previous_consumption_on_period)/(
-                    (values['date_time']-entry_date).total_seconds()/60)*30.0
+                consumption += (values['kwh']-previous_consumption_on_period)/((
+                    (values['date_time']-entry_date).total_seconds()/60.0)+30.0)*30.0
             previous_empty_periods_comsumption += consumption / \
                 len(just_after_period_entry)
             period_consumption = abs(consumption /
@@ -121,7 +123,7 @@ def standardisation_one_year_thirty_minutes(dataframe, df_result):
 
 def standardisation_one_year_thirty_minutes_multi_threading(dataframe, df_result):
     x = len(df_result)
-    recovery = 96
+    recovery = 24
     step = recovery*183
     df_mt_result = pd.DataFrame(columns=['date_time', 'kwh'])
     if x < step:
@@ -142,8 +144,28 @@ def standardisation_one_year_thirty_minutes_multi_threading(dataframe, df_result
                 y += step
                 t.start()
                 threads_list.append(t)
-            t = Thread(target=lambda q, arg1, arg2: q.put(standardisation_one_year_thirty_minutes(
-                arg1, arg2)), args=(que, dataframe, df_result[y-2*recovery:].copy()), daemon=True)
+            if step == (x-y+2*recovery):
+                if x-y == step:
+                    t = Thread(target=lambda q, arg1, arg2: q.put(standardisation_one_year_thirty_minutes(
+                        arg1, arg2)), args=(que, dataframe, df_result[y-4*recovery:].copy()), daemon=True)
+                    last_step_len = x-y+4*recovery
+                    multiplier = 3
+                else:
+                    t = Thread(target=lambda q, arg1, arg2: q.put(standardisation_one_year_thirty_minutes(
+                        arg1, arg2)), args=(que, dataframe, df_result[y-3*recovery:].copy()), daemon=True)
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+            else:
+                if x-y == step:
+                    t = Thread(target=lambda q, arg1, arg2: q.put(standardisation_one_year_thirty_minutes(
+                        arg1, arg2)), args=(que, dataframe, df_result[y-3*recovery:].copy()), daemon=True)
+                    last_step_len = x-y+3*recovery
+                    multiplier = 2
+                else:
+                    t = Thread(target=lambda q, arg1, arg2: q.put(standardisation_one_year_thirty_minutes(
+                        arg1, arg2)), args=(que, dataframe, df_result[y-2*recovery:].copy()), daemon=True)
+                    last_step_len = x-y+2*recovery
+                    multiplier = 1
             t.start()
             threads_list.append(t)
             for t in threads_list:
@@ -152,8 +174,9 @@ def standardisation_one_year_thirty_minutes_multi_threading(dataframe, df_result
                 df_mt = que.get()
                 if len(df_mt) == step:
                     df_mt_result = df_mt_result.append(df_mt[0:step-recovery])
-                elif len(df_mt) == (x-y+2*recovery):
-                    df_mt_result = df_mt_result.append(df_mt[recovery:])
+                elif len(df_mt) == last_step_len:
+                    df_mt_result = df_mt_result.append(
+                        df_mt[multiplier*recovery:])
                 else:
                     df_mt_result = df_mt_result.append(
                         df_mt[recovery:step+recovery])
@@ -194,8 +217,28 @@ def standardisation_one_year_thirty_minutes_multi_processing(dataframe, df_resul
             y += step
             p.start()
             process_list.append(p)
-        p = Process(target=standardisation_one_year_thirty_minutes_for_mp, args=(
-            dataframe, df_result[y-2*recovery:].copy(), len(process_list), return_dict))
+        if step == (x-y+2*recovery):
+            if x-y == step:
+                p = Process(target=standardisation_one_year_thirty_minutes_for_mp, args=(
+                    dataframe, df_result[y-4*recovery:].copy(), len(process_list), return_dict))
+                last_step_len = x-y+4*recovery
+                multiplier = 3
+            else:
+                p = Process(target=standardisation_one_year_thirty_minutes_for_mp, args=(
+                    dataframe, df_result[y-3*recovery:].copy(), len(process_list), return_dict))
+                last_step_len = x-y+3*recovery
+                multiplier = 2
+        else:
+            if x-y == step:
+                p = Process(target=standardisation_one_year_thirty_minutes_for_mp, args=(
+                    dataframe, df_result[y-3*recovery:].copy(), len(process_list), return_dict))
+                last_step_len = x-y+3*recovery
+                multiplier = 2
+            else:
+                p = Process(target=standardisation_one_year_thirty_minutes_for_mp, args=(
+                    dataframe, df_result[y-2*recovery:].copy(), len(process_list), return_dict))
+                last_step_len = x-y+2*recovery
+                multiplier = 1
         p.start()
         process_list.append(p)
         for p in process_list:
@@ -204,8 +247,8 @@ def standardisation_one_year_thirty_minutes_multi_processing(dataframe, df_resul
             df_mt = return_dict[i]
             if len(df_mt) == step:
                 df_mt_result = df_mt_result.append(df_mt[0:step-recovery])
-            elif len(df_mt) == (x-y+2*recovery):
-                df_mt_result = df_mt_result.append(df_mt[recovery:])
+            elif len(df_mt) == last_step_len:
+                df_mt_result = df_mt_result.append(df_mt[multiplier*recovery:])
             else:
                 df_mt_result = df_mt_result.append(
                     df_mt[recovery:step+recovery])
