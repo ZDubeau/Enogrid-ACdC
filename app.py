@@ -149,7 +149,7 @@ def get_download_files(id):
     for row in all_id_f:
         id_f = row[0]
         pd.read_sql(f'SELECT date_time, kwh FROM result WHERE id_f={id_f} ORDER BY date_time ASC;', engine).to_csv(
-            os.path.join(os.getcwd(), app.config['DOWNLOAD_FOLDER'], f'file_{id_f}.csv'))
+            os.path.join(os.getcwd(), app.config['DOWNLOAD_FOLDER'], f'file_{id_f}.csv'), sep=";", decimal=",")
     fileobj = io.BytesIO()
     with zipfile.ZipFile(fileobj, 'w') as zip_file:
         for root, dirs, files in os.walk(os.path.join(
@@ -201,7 +201,7 @@ def get_download_file(id):
     engine = make_engine()
     df_file_result = pd.read_sql(
         f'SELECT date_time, kwh FROM result WHERE id_f={id} ORDER BY date_time ASC;', engine)
-    resp = make_response(df_file_result.to_csv())
+    resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
     resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp
@@ -214,7 +214,7 @@ def get_download_file_normalise(id):
     engine = make_engine()
     df_file_result = pd.read_sql(
         f'SELECT date_time, kwh FROM normalisation WHERE id_f={id} ORDER BY date_time ASC;', engine)
-    resp = make_response(df_file_result.to_csv())
+    resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
     resp.headers["Content-Disposition"] = "attachment; filename=export_normalise.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp
@@ -382,7 +382,7 @@ def file_treatment(id, dfjson, dispatching_info: str):
         conn, cur = ConnexionDB()
         engine = make_engine()
         Execute_SQL(cur, td.update_files_in_progress, {'id_f': id})
-        df = pd.read_json(dfjson, typ='frame', orient='table',
+        df = pd.read_json(dfjson, type='frame', orient='table',
                           convert_dates=False, convert_axes=False)
         Commit(conn)
         file_type, identification_duration, preparation_duration, normalisation_duration, standardisation_duration, dataframe, df_result = identification.identification_normalisation_standardisation(
