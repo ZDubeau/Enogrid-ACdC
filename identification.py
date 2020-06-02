@@ -94,9 +94,9 @@ if __name__ == "__main__":
         Path(os.path.join(
             os.getcwd(), "result")).mkdir(parents=True, exist_ok=True)
         dataframe.to_csv('result/result_normalisation_' +
-                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv")
+                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv", sep=";", decimal=",")
         df_result.to_csv('result/result_' +
-                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv")
+                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv", sep=";", decimal=",")
         kwh_one_year_normal = round(
             vd.kwh_on_normalize_df(dataframe), 2)
         kwh_one_year_standard = round(df_result['kwh'].sum(), 2)

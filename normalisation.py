@@ -467,7 +467,7 @@ def template8(df: pd.DataFrame, origin="standalone"):
     df.reset_index(inplace=True, drop=True)
     df.drop_duplicates(subset='date_time', keep='first', inplace=True)
 
-    # df.to_csv("result_intermediaire_"+csv)
+    # df.to_csv("result_intermediaire_"+csv, sep=";", decimal=",")
     df_result = pd.DataFrame(columns=['date_time', 'kW'])
     for index, row in df.iterrows():
         if index == len(df)-1:
