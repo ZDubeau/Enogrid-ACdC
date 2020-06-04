@@ -23,7 +23,7 @@ import protocole_DB
 from protocole_DB import ConnexionDB, DeconnexionDB, make_engine, Execute_SQL, Commit
 import definition_tables as td
 import identification
-import validation
+import validation as vd
 # _____________________________________________________________________________________
 
 url = urllib.parse.urlparse(os.environ.get('REDISCLOUD_URL'))
@@ -382,7 +382,7 @@ def file_treatment(id, dfjson, dispatching_info: str):
         conn, cur = ConnexionDB()
         engine = make_engine()
         Execute_SQL(cur, td.update_files_in_progress, {'id_f': id})
-        df = pd.read_json(dfjson, type='frame', orient='table',
+        df = pd.read_json(dfjson, typ='frame', orient='table',
                           convert_dates=False, convert_axes=False)
         Commit(conn)
         file_type, identification_duration, preparation_duration, normalisation_duration, standardisation_duration, dataframe, df_result = identification.identification_normalisation_standardisation(
@@ -392,8 +392,11 @@ def file_treatment(id, dfjson, dispatching_info: str):
         dataframe['id_f'] = id
         dataframe.to_sql('normalisation', con=engine,
                          index=False, if_exists='append')
-        kwh_one_year_normal = round(
-            validation.kwh_on_normalize_df(dataframe), 2)
+        if len(dataframe) == 0:
+            kwh_one_year_normal = 0
+        else:
+            kwh_one_year_normal = round(
+                vd.kwh_on_normalize_df(dataframe), 2)
         kwh_one_year_standard = round(df_result['kwh'].sum(), 2)
         Execute_SQL(cur, td.update_files_done, {'id_f': id, "template": file_type, 'number_line': len(
             dataframe), "normalisation_duration": identification_duration+preparation_duration+normalisation_duration, "standardisation_duration": standardisation_duration, "kwh_one_year_normal": kwh_one_year_normal, "kwh_one_year_standard": kwh_one_year_standard})
