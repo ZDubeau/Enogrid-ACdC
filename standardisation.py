@@ -184,7 +184,6 @@ def standardisation_one_year_thirty_minutes_multi_threading(dataframe, df_result
             df_mt_result.reset_index(inplace=True, drop=True)
         except:
             print("Issue in multithreaded conversion")
-
     return df_mt_result
 
 
@@ -256,5 +255,4 @@ def standardisation_one_year_thirty_minutes_multi_processing(dataframe, df_resul
         df_mt_result.reset_index(inplace=True, drop=True)
         # except:
         #    print("Issue in multiprocessing conversion for standardisation")
-
     return df_mt_result

@@ -59,6 +59,7 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
         "['Date', 'Time', 'kWh']": nm.template7,
         "['Datetime;W;W']": nm.template8,
         "['Horodate;Wh']": nm.template9}
+    dataframe = None
     try:
         function = dispatch[dispatching_info]
         end_identification_date = datetime.datetime.now()
@@ -76,13 +77,14 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
         else:
             df_result = sd.standardisation_one_year_thirty_minutes_multi_threading(
                 dataframe, df_result)
+        df_result['kwh'] = df_result['kwh'].astype(float)
         end_standard_date = datetime.datetime.now()
         return file_type, end_identification_date-start_date, preparation, end_import_date-end_identification_date, end_standard_date - end_import_date, dataframe, df_result
     except Exception as error:
         end_identification_date = datetime.datetime.now()
         traitement = end_identification_date-start_date
         if dataframe is None:
-            return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['Date_Time', 'kW']), pd.DataFrame(columns=['date_time', 'kwh'])
+            return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['date_time', 'kwh']), pd.DataFrame(columns=['date_time', 'kwh'])
         else:
             return error, traitement, traitement, traitement, traitement, dataframe, pd.DataFrame(columns=['date_time', 'kwh'])
 
@@ -93,12 +95,16 @@ if __name__ == "__main__":
             sys.argv[1], "standalone")
         Path(os.path.join(
             os.getcwd(), "result")).mkdir(parents=True, exist_ok=True)
-        dataframe.to_csv('result/result_normalisation_' +
-                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv", sep=";", decimal=",")
-        df_result.to_csv('result/result_' +
-                         str.split(str.split(sys.argv[1], '/')[-1], '.')[0]+".csv", sep=";", decimal=",")
-        kwh_one_year_normal = round(
-            vd.kwh_on_normalize_df(dataframe), 2)
+        stamp = "_" + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        dataframe.to_excel('result/result_normalisation_' +
+                           str.split(str.split(sys.argv[1], '/')[-1], '.')[0] + stamp + ".xlsx")
+        df_result.to_excel('result/result_' +
+                           str.split(str.split(sys.argv[1], '/')[-1], '.')[0] + stamp + ".xlsx")
+        if len(dataframe) == 0:
+            kwh_one_year_normal = 0
+        else:
+            kwh_one_year_normal = round(
+                vd.kwh_on_normalize_df(dataframe), 2)
         kwh_one_year_standard = round(df_result['kwh'].sum(), 2)
         if kwh_one_year_normal == 0:
             ppb = "Normalisation incorrecte"
