@@ -9,19 +9,21 @@ import normalisation as nm
 import standardisation as sd
 import validation as vd
 from pathlib import Path
+import re
 
 
 def identification(file):
-    extension = str.split(file, '.')[1]
-    if extension == 'csv':
+    extension = file.suffix
+    #extension = str.split(file, '.')[1]
+    if extension == '.csv':
         with io.open(file, 'r', encoding='utf-8') as f:
             dispatching_info = str(next(csv.reader(f)))
         df = pd.read_csv(file, sep='delimiter', engine='python')
-    elif extension == 'xlsx':
+    elif extension == '.xlsx':
         dispatching_info = str(pd.read_excel(
             file, engine="openpyxl").columns.ravel().tolist())
         df = pd.read_excel(file, engine="openpyxl")
-    elif extension == 'xls':
+    elif extension == '.xls':
         dispatching_info = str(pd.read_excel(
             file).columns.ravel().tolist())
         df = pd.read_excel(file)
@@ -51,10 +53,14 @@ def iden_norm_stand(file, origin='standalone'):
 def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_info, start_date, origin="standalone"):
     dispatch = {
         "['\\ufeffdatetime;W']": nm.template1,
+        "['//ufeffdatetime;W']": nm.template1,
+        "['ufeffdatetime;W']": nm.template1,
         "['Date;Time;W']": nm.template2,
         "['Datetime;W']": nm.template3,
         "['Datetime', 'W', 'Unnamed: 2']": nm.template4,
         "['\\ufeffHorodate;W']": nm.template5,
+        "['//ufeffHorodate;W']": nm.template5,
+        "['ufeffHorodate;W']": nm.template5,
         "['Datetime', 'kW']": nm.template6,
         "['Date', 'Time', 'kWh']": nm.template7,
         "['Datetime;W;W']": nm.template8,
@@ -91,15 +97,18 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
 
 if __name__ == "__main__":
     try:
+        filepath = Path(sys.argv[1])
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = iden_norm_stand(
-            sys.argv[1], "standalone")
+            filepath, "standalone")
         Path(os.path.join(
             os.getcwd(), "result")).mkdir(parents=True, exist_ok=True)
         stamp = "_" + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-        dataframe.to_excel('result/result_normalisation_' +
-                           str.split(str.split(sys.argv[1], '/')[-1], '.')[0] + stamp + ".xlsx")
-        df_result.to_excel('result/result_' +
-                           str.split(str.split(sys.argv[1], '/')[-1], '.')[0] + stamp + ".xlsx")
+        filename_result_normalisation = os.path.join(
+            os.getcwd(), "result", "result_normalisation_" + filepath.stem + stamp + ".xlsx")
+        filename_result = os.path.join(
+            os.getcwd(), "result", "result_" + filepath.stem + stamp + ".xlsx")
+        dataframe.to_excel(filename_result_normalisation)
+        df_result.to_excel(filename_result)
         if len(dataframe) == 0:
             kwh_one_year_normal = 0
         else:
@@ -117,4 +126,4 @@ if __name__ == "__main__":
         print("Standardisation :", standardisation)
         print("Part Per Billion :", ppb)
     except Exception as error:
-        print("Traitemet impossible :", error)
+        print("Traitement impossible :", error)
