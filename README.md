@@ -9,3 +9,6 @@ flask run
 
 # Automate
 celery -A app.celery worker
+
+# Pytest
+pytest --ignore=data
