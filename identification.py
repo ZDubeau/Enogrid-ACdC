@@ -30,13 +30,13 @@ def identification(file):
     else:
         dispatching_info = f'File extension {extension} unknown - treatment impossible'
         df = pd.DataFrame(columns=['Date_Time', 'kW'])
-    return dispatching_info, df
+    return dispatching_info.replace("\\", ""), df
 
 
 def iden_norm_stand(file, origin='standalone'):
     start_date = datetime.datetime.now()
     try:
-        dispatching_info, df = identification(file)
+        dispatching_info, df = identification(Path(file))
         if (not dispatching_info.find("File extension ")):
             end_identification_date = datetime.datetime.now()
             traitement = end_identification_date-start_date
@@ -52,14 +52,10 @@ def iden_norm_stand(file, origin='standalone'):
 
 def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_info, start_date, origin="standalone"):
     dispatch = {
-        "['\\ufeffdatetime;W']": nm.template1,
-        "['//ufeffdatetime;W']": nm.template1,
         "['ufeffdatetime;W']": nm.template1,
         "['Date;Time;W']": nm.template2,
         "['Datetime;W']": nm.template3,
         "['Datetime', 'W', 'Unnamed: 2']": nm.template4,
-        "['\\ufeffHorodate;W']": nm.template5,
-        "['//ufeffHorodate;W']": nm.template5,
         "['ufeffHorodate;W']": nm.template5,
         "['Datetime', 'kW']": nm.template6,
         "['Date', 'Time', 'kWh']": nm.template7,
@@ -90,9 +86,9 @@ def identification_normalisation_standardisation(df: pd.DataFrame, dispatching_i
         end_identification_date = datetime.datetime.now()
         traitement = end_identification_date-start_date
         if dataframe is None:
-            return error, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['date_time', 'kwh']), pd.DataFrame(columns=['date_time', 'kwh'])
+            return dispatching_info, traitement, traitement, traitement, traitement, pd.DataFrame(columns=['date_time', 'kwh']), pd.DataFrame(columns=['date_time', 'kwh'])
         else:
-            return error, traitement, traitement, traitement, traitement, dataframe, pd.DataFrame(columns=['date_time', 'kwh'])
+            return dispatching_info, traitement, traitement, traitement, traitement, dataframe, pd.DataFrame(columns=['date_time', 'kwh'])
 
 
 if __name__ == "__main__":
@@ -102,7 +98,7 @@ if __name__ == "__main__":
             filepath, "standalone")
         Path(os.path.join(
             os.getcwd(), "result")).mkdir(parents=True, exist_ok=True)
-        stamp = "_" + datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        stamp = "_" + datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
         filename_result_normalisation = os.path.join(
             os.getcwd(), "result", "result_normalisation_" + filepath.stem + stamp + ".xlsx")
         filename_result = os.path.join(
