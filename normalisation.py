@@ -258,7 +258,7 @@ def template1(df: pd.DataFrame, origin="standalone"):
 
     start_date = datetime.datetime.now()
 
-    new = df['datetime;W'].str.split('(;| )', n=2, expand=True)
+    new = df[df.columns.values[0]].str.split('(;| )', n=2, expand=True)
     df['date_time'] = new[0]
     df['Watts'] = new[2]
     df['date_time'] = pd.to_datetime(
@@ -372,7 +372,7 @@ def template5(df: pd.DataFrame, origin="standalone"):
 
     start_date = datetime.datetime.now()
 
-    new = df['Horodate;W'].str.split('([^]*;[^]*;)', n=2, expand=True)
+    new = df[df.columns.values[0]].str.split('([^]*;[^]*;)', n=2, expand=True)
     df['date_time'] = new[1]
     df['Watts'] = new[2]
     df['date_time'] = df['date_time'].str.replace("T", " ", case=False)
