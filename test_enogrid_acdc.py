@@ -2,12 +2,14 @@ import identification as ident
 import validation as valid
 import pandas as pd
 import datetime
+import os
 
 option = "standalone"
 
 try:
     def test_template_1_60_min():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/1/Template1-60minutes.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut',
+                                '1', 'Template1-60minutes.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 146.30558
@@ -22,7 +24,8 @@ except:
 
 try:
     def test_template_30_min():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/1/Template1-30minutes.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut',
+                                '1', 'Template1-30minutes.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 73.15279
@@ -37,7 +40,8 @@ except:
 
 try:
     def test_template_1_20_min():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/1/Template1-20min.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut',
+                                '1', 'Template1-20min.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 48.76853
@@ -52,7 +56,8 @@ except:
 
 try:
     def test_template_1_10_min():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/1/Template1-10min.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut',
+                                '1', 'Template1-10min.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 24.38426
@@ -67,7 +72,7 @@ except:
 
 try:
     def test_template_1():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template1.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template1.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -81,6 +86,7 @@ except:
 
 try:
     def test_template_2():
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template2.csv')
         filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template2.csv"
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
@@ -95,7 +101,7 @@ except:
 
 try:
     def test_template_3():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template3.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template3.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -109,7 +115,7 @@ except:
 
 try:
     def test_template_4():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template4.xlsx"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template4.xlsx')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -123,7 +129,7 @@ except:
 
 try:
     def test_template_5():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template5.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template5.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -137,7 +143,7 @@ except:
 
 try:
     def test_template_6():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template6.xls"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template6.xls')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -151,7 +157,7 @@ except:
 
 try:
     def test_template_7():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template7.xlsx"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template7.xlsx')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -165,7 +171,7 @@ except:
 
 try:
     def test_template_8():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template8.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template8.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -179,7 +185,7 @@ except:
 
 try:
     def test_template_9():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template9.csv"
+        filename = os.path.join(os.getcwd(), 'files_brut', 'Template9.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert dataframe['date_time'][0] == datetime.datetime(
@@ -193,7 +199,8 @@ except:
 
 try:
     def test_template_4_copy():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template4_copy.xlsx"
+        filename = os.path.join(
+            os.getcwd(), 'files_brut', 'Template4_copy.xlsx')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 0.04042
@@ -208,7 +215,8 @@ except:
 
 try:
     def test_template_5_copy():
-        filename = "/home/zahra/Simplon/May/Enogrid-ACdC/files_brut/Template5_copy.csv"
+        filename = os.path.join(
+            os.getcwd(), 'files_brut', 'Template5_copy.csv')
         file_type, identification, preparation, normalisation, standardisation, dataframe, df_result = ident.iden_norm_stand(
             filename, option)
         assert round(dataframe['kwh'].sum(), 5) == 1892.33333
