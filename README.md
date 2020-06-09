@@ -1,7 +1,7 @@
 # Enogrid - ACdC
 
 # Virtual environment
-pipenv install --dev
+pipenv install --dev<br/>
 pipenv shell
 
 # API local
