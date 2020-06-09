@@ -1,14 +1,14 @@
 # Enogrid - ACdC
 
-# Virtual environment
+## Virtual environment
 pipenv install --dev<br/>
 pipenv shell
 
-# API local
+## API local
 flask run
 
-# Automate
+## Automate
 celery -A app.celery worker
 
-# Pytest
+## Pytest
 pytest --ignore=data
