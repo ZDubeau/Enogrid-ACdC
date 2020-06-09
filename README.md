@@ -23,7 +23,7 @@ Using `docker-compose`, you can manage a local PostgreSQL:
     Password for user enogrid: password
 
     santa_data=# \dt; (See tables)
-    santa_data=# SELECT * FROM table;
+    santa_data=# SELECT * FROM table_name;
     santa_data=# \q ((quit)
 ```
 
