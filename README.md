@@ -1,8 +1,13 @@
 # Enogrid - ACdC
 
-## Virtual environment
-pipenv install --three<br/>
-pipenv shell
+## Requirements
+- `python3` + `pipenv`
+- [`docker`](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- [`docker-compose`](https://docs.docker.com/compose/install/)
+
+## Launch pipenv
+- pipenv install --three<br/>
+- pipenv shell
 
 ## Docker compose
 sudo docker-compose up -d<br/>
