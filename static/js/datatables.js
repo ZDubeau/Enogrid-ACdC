@@ -141,20 +141,20 @@ $(document).ready(function () {
   $('#dataTableProjectEditAllFiles').DataTable({
     "columnDefs": [
       { "visible": false, "targets": 0 },
-      { "visible": false, "targets": 1 },
+      { "width": "30px", "targets": 1 },
       { "width": "30px", "targets": 2 },
       { "width": "30px", "targets": 3 },
       { "width": "30px", "targets": 4 },
-      { "width": "30px", "targets": 5 },
-      { "width": "20px", "targets": 6 },
+      { "width": "20px", "targets": 5 },
+      { "width": "25px", "targets": 6 },
       { "width": "25px", "targets": 7 },
       { "width": "25px", "targets": 8 }
     ],
     "columns": [
       { title: "" },
-      { title: "" },
       { title: "Nom" },
       { title: "Type" },
+      { title: "Template" },
       { title: "kWh_normalisé" },
       { title: "kWh_standardisé" },
       { title: "Delta (ppb)" },
@@ -163,22 +163,22 @@ $(document).ready(function () {
     ],
     "order": [[0, "desc"]],
     "fnRowCallback": function (nRow, aData) {
-      var ppm = aData[6];
+      var ppm = aData[5];
       switch (ppm) {
         case "NaN":
-          $('td:eq(4)', nRow).html("");
+          $('td:eq(3)', nRow).html("");
           break;
         default:
           ppm = Math.abs(Math.round(ppm));
-          $('td:eq(4)', nRow).html(ppm);
+          $('td:eq(3)', nRow).html(ppm);
       }
       var id = aData[0];
-      $('td:eq(5)', nRow).html(download);
-      $('td:eq(5)', nRow).click(function () {
-        window.location.href = '/download_file_normalise/' + id;
-      });
       $('td:eq(6)', nRow).html(download);
       $('td:eq(6)', nRow).click(function () {
+        window.location.href = '/download_file_normalise/' + id;
+      });
+      $('td:eq(7)', nRow).html(download);
+      $('td:eq(7)', nRow).click(function () {
         window.location.href = '/download_file/' + id;
       });
     }

@@ -75,14 +75,14 @@ def get_homepage():
     data_stand = list()
     if nb_projects > 0:
         Execute_SQL(
-            cur, f"SELECT count(id_f) FROM files WHERE status='Analysé'")
+            cur, f"SELECT count(id_f) FROM files_caracteristics WHERE status='Analysé'")
         avg_files = round(cur.fetchone()[0]/nb_projects, 1)
         if avg_files > 0:
-            Execute_SQL(cur, "SELECT sum(number_line) AS lines, (sum(normalisation_duration)+sum(standardisation_duration)) AS total_time FROM files WHERE files.status='Analysé'")
+            Execute_SQL(cur, "SELECT sum(number_line) AS lines, (sum(normalisation_duration)+sum(standardisation_duration)) AS total_time FROM files_caracteristics WHERE status='Analysé'")
             data = cur.fetchone()
             avg_time_10000 = int(round(
                 10000*data[1].total_seconds()/float(data[0]), 0))
-            Execute_SQL(cur, "SELECT template, sum(number_line) AS lines, sum(normalisation_duration) AS norm, sum(standardisation_duration) AS stand FROM files WHERE files.status='Analysé' GROUP BY template ORDER BY template ASC")
+            Execute_SQL(cur, "SELECT template, sum(number_line) AS lines, sum(normalisation_duration) AS norm, sum(standardisation_duration) AS stand FROM files_caracteristics WHERE status='Analysé' GROUP BY template ORDER BY template ASC")
             for row in cur.fetchall():
                 categories.append(row[0])
                 lines = float(row[1])
@@ -131,7 +131,7 @@ def get_project_edit(id):
     DeconnexionDB(conn, cur)
     engine = make_engine()
     df_files = pd.read_sql(
-        f"SELECT id_f as id_file, id_pa as id_projet,file_name as Name, status, template, file_type as type, number_line as longueur, normalisation_duration as normalisation, standardisation_duration as standardisation,'' as télécharger, '' supprimer FROM files WHERE id_pa={id};", engine)
+        f"SELECT f.id_f as id_file, pfl.id_pa as id_projet, f.file_name as Name, fc.status, fc.template, f.file_type as type, fc.number_line as longueur, fc.normalisation_duration as normalisation, fc.standardisation_duration as standardisation, '' as télécharger, '' supprimer FROM files AS f INNER JOIN projects_files_links AS pfl ON f.id_f=pfl.id_f INNER JOIN files_caracteristics AS fc ON f.id_f=fc.id_f WHERE pfl.id_pa={id}", engine)
     return render_template('pages/project_edit.html', project_name=project_name, tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditFiles', index=False)], errorMessage=errorMessage, id_pa=id)
 
 #______________________ Download Files for Project _________________________#
@@ -225,8 +225,7 @@ def get_download_file_normalise(id):
 @app.route('/files', methods=['GET'])
 def get_files():
     engine = make_engine()
-    df_files = pd.read_sql(
-        "SELECT id_f as id_file, id_pa as id_projet, file_name as name, template, kwh_one_year_normal as kwh_normalisé, kwh_one_year_standard as kwh_standardisé,(CASE WHEN kwh_one_year_normal=0 THEN NULL WHEN kwh_one_year_normal IS NULL THEN NULL ELSE 1000000000*(1-kwh_one_year_standard/kwh_one_year_normal) END ) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files;", engine)
+    df_files = pd.read_sql("SELECT f.id_f as id_file, f.file_name as name, f.file_type as type, fc.template, fc.kwh_one_year_normal as kwh_normalisé, fc.kwh_one_year_standard as kwh_standardisé, (CASE WHEN fc.kwh_one_year_normal=0 THEN NULL WHEN fc.kwh_one_year_normal IS NULL THEN NULL ELSE 1000000000*(1-fc.kwh_one_year_standard/fc.kwh_one_year_normal) END) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files AS f LEFT JOIN files_caracteristics AS fc ON f.id_f=fc.id_f", engine)
     return render_template('pages/files.html', tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditAllFiles', index=False)])
 
 #_____________________________ Add File _____________________________#
@@ -241,15 +240,21 @@ def get_file_add():
     if file and allowed_file(file.filename):
         file_type = request.form["file_type"]
         Execute_SQL(cur, td.insert_files, {
-            'id_pa': id_pa, 'file_name': file_name, 'file_type': file_type})
+                    'file_name': file_name, 'file_type': file_type})
         Commit(conn)
         id_f = cur.fetchone()[0]
+        Execute_SQL(cur, td.insert_files_caracteristics, {
+            'id_f': id_f})
+        Commit(conn)
+        Execute_SQL(cur, td.insert_projects_files_links, {
+            'id_pa': id_pa, 'id_f': id_f})
+        Commit(conn)
         filename = os.path.join(
             os.getcwd(), app.config['UPLOAD_FOLDER'], str(id_f) + "." + file.filename.rsplit('.', 1)[1].lower())
         Path(os.path.join(
             os.getcwd(), app.config['UPLOAD_FOLDER'])).mkdir(parents=True, exist_ok=True)
         file.save(filename)
-        dispatching_info, df = identification.identification(filename)
+        dispatching_info, df = identification.identification(Path(filename))
         if (not dispatching_info.find("File extension ")):
             errorMessage = "Fichier non valide"
         else:
@@ -270,7 +275,7 @@ def get_graph(id):
     conn, cur = ConnexionDB()
     # Query permettant de récupérer la consommation mensualle pour un projet :
     Execute_SQL(
-        cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'consommation' AND id_pa={id}) GROUP BY month ORDER BY month;")
+        cur, f"SELECT extract(MONTH FROM r.date_time) as month, sum(r.kwh) as conso FROM result AS r LEFT JOIN files as f ON r.id_f=f.id_f LEFT JOIN projects_files_links AS pfl ON r.id_f=pfl.id_f WHERE r.date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND f.file_type = 'consommation' AND pfl.id_pa={id} GROUP BY month ORDER BY month;")
     # Initialisation de consommation par défaut :
     consommation_data = [0.0] * 12
     i = 0
@@ -279,7 +284,7 @@ def get_graph(id):
         i += 1
     # Query permettant de récupérer la production mensualle pour un projet :
     Execute_SQL(
-        cur, f"SELECT extract( MONTH FROM date_time) as month, sum(kwh) as conso FROM result WHERE date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND id_f IN (SELECT id_f FROM files WHERE file_type = 'production' AND id_pa={id}) GROUP BY month ORDER BY month;")
+        cur, f"SELECT extract(MONTH FROM r.date_time) as month, sum(kwh) as production FROM result AS r LEFT JOIN files as f ON r.id_f=f.id_f LEFT JOIN projects_files_links AS pfl ON r.id_f=pfl.id_f WHERE r.date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND f.file_type = 'production' AND pfl.id_pa={id} GROUP BY month ORDER BY month;")
     # Initialisation de production & du surplus par défaut :
     production_data = [0.0] * 12
     surplus_data = [0.0] * 12
@@ -294,7 +299,7 @@ def get_graph(id):
     conn, cur = ConnexionDB()
     # Query permettant de récupérer pour chaque fichier de consommation du projet la consommation mensualle :
     Execute_SQL(
-        cur, f"SELECT files.id_f as id, files.file_name as file_name, extract( MONTH FROM result.date_time) as month, sum(result.kwh) as conso FROM result JOIN files ON result.id_f=files.id_f WHERE result.date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND files.file_type = 'consommation' AND files.id_pa={id} GROUP BY files.id_f, file_name,month ORDER BY files.id_f, file_name,month;")
+        cur, f"SELECT f.id_f as id, f.file_name as file_name, extract(MONTH FROM r.date_time) as month, sum(r.kwh) as conso FROM result AS r LEFT JOIN files AS f ON r.id_f=f.id_f LEFT JOIN projects_files_links AS pfl ON r.id_f=pfl.id_f WHERE r.date_time BETWEEN '2019-01-01 00:00:00' AND '2019-12-31 23:30:00' AND f.file_type = 'consommation' AND pfl.id_pa={id} GROUP BY f.id_f, f.file_name,month ORDER BY f.id_f, f.file_name,month;")
     actual_id_file = 0
     result_list = list()
     # La boucle qui permet de créer la consommation mensualle & estimer
