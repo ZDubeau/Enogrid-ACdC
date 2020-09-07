@@ -201,7 +201,8 @@ def get_download_file(id):
     engine = make_engine()
     df_file_result = pd.read_sql(
         f'SELECT date_time, kwh FROM result WHERE id_f={id} ORDER BY date_time ASC;', engine)
-    resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
+    #resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
+    resp = make_response(df_file_result.to_csv(sep=";", decimal=","))
     resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp
@@ -214,7 +215,7 @@ def get_download_file_normalise(id):
     engine = make_engine()
     df_file_result = pd.read_sql(
         f'SELECT date_time, kwh FROM normalisation WHERE id_f={id} ORDER BY date_time ASC;', engine)
-    resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
+    resp = make_response(df_file_result.to_csv(sep=";", decimal=","))
     resp.headers["Content-Disposition"] = "attachment; filename=export_normalise.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp

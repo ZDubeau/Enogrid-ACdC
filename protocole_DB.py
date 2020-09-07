@@ -1,20 +1,22 @@
-""" Projet Enogrid-ACdC """
-#---------------------------------------------#
-""" Module by Zahra
-𐤟 Création : 2020-05-05
-𐤟 Dernière MàJ : 2020-05-10
-"""
-#--------------------------------------------#
-
-
-
-
+#----------------------------------------------------------#
+#                     Projet Enogrid-ACdC                  #
+#----------------------------------------------------------#
+'''
+                  Module by Zahra
+                  Creation : 2020-05-05
+                  Last update : 2020-05-10
+'''
+#----------------------------------------------------------#
 from sqlalchemy.engine import url as sqla_url
 from sqlalchemy import create_engine
 import os
 from psycopg2 import Error
 import psycopg2
-import psycopg2.extras, sys, json
+import psycopg2.extras
+import sys
+import json
+
+
 def ConnexionDB():
     dbname = os.getenv("DB_NAME")
     user = os.getenv("USER")

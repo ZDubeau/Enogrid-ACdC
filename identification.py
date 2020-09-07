@@ -1,5 +1,5 @@
-import glob
-import io
+import glob     # Finds all the pathnames matching a specified pattern
+import io       # Core tools for working with streams
 import os
 import csv
 import sys

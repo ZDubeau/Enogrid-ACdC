@@ -1,14 +1,15 @@
-""" Projet Enogrid-ACdC """
-############################################
-""" Module by Zahra
-𐤟 Création : 2020-05-05
-𐤟 Dernière MàJ : 2020-05-05
-"""
-############################################
-
-
+#----------------------------------------------------------#
+#                     Projet Enogrid-ACdC                  #
+#----------------------------------------------------------#
+'''
+                  Module by Zahra
+                  Creation : 2020-05-05
+                  Last update : 2020-05-05
+'''
+#----------------------------------------------------------#
 import definition_tables
 import protocole_DB
+
 full_actions_list = (definition_tables.drop_project_analyse,
                      definition_tables.drop_files,
                      definition_tables.drop_files_caracteristics,

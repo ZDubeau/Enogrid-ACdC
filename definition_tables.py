@@ -3,8 +3,8 @@
 #----------------------------------------------------------#
 '''
                   Module by Zahra
-                  Création : 2020-05-05
-                  Dernière MàJ : 2020-05-18
+                  Creation : 2020-05-05
+                  Last update : 2020-05-18
 '''
 #-------------- Tables des projets analyse ----------------#
 
@@ -56,8 +56,8 @@ drop_files = """
             """
 
 drop_files_caracteristics = """
-            DROP TABLE IF EXISTS files_caracteristics CASCADE;
-            """
+                            DROP TABLE IF EXISTS files_caracteristics CASCADE;
+                            """
 
 # CASCADE means that the updated values of the referenced column(s) should be copied into the referencing row(s)
 files = """
@@ -69,18 +69,18 @@ files = """
       """
 
 files_caracteristics = """
-        CREATE TABLE IF NOT EXISTS files_caracteristics (
-          id_f_c SERIAL PRIMARY KEY,
-          id_f INTEGER REFERENCES files ON DELETE CASCADE,
-          status VARCHAR(20),
-          template VARCHAR(200),
-          number_line BIGINT,
-          normalisation_duration INTERVAL,
-          standardisation_duration INTERVAL,
-          kwh_one_year_normal FLOAT,
-          kwh_one_year_standard FLOAT
-        )
-      """
+                        CREATE TABLE IF NOT EXISTS files_caracteristics (
+                          id_f_c SERIAL PRIMARY KEY,
+                          id_f INTEGER REFERENCES files ON DELETE CASCADE,
+                          status VARCHAR(20),
+                          template VARCHAR(200),
+                          number_line BIGINT,
+                          normalisation_duration INTERVAL,
+                          standardisation_duration INTERVAL,
+                          kwh_one_year_normal FLOAT,
+                          kwh_one_year_standard FLOAT
+                        )
+                      """
 
 insert_files = """
               INSERT INTO files (file_name, file_type)
@@ -88,9 +88,9 @@ insert_files = """
               """
 
 insert_files_caracteristics = """
-              INSERT INTO files_caracteristics (id_f, status)
-              VALUES (%(id_f)s, 'Non analysé') returning id_f_c;
-              """
+                              INSERT INTO files_caracteristics (id_f, status)
+                              VALUES (%(id_f)s, 'Non analysé') returning id_f_c;
+                              """
 
 select_files = """
               SELECT * 
@@ -104,10 +104,10 @@ update_files_in_progress = """
                           """
 
 update_files_error = """
-                    UPDATE files_caracteristics 
-                    SET status='Erreur' 
-                    WHERE id_f=%(id_f)s;
-                    """
+                      UPDATE files_caracteristics 
+                      SET status='Erreur' 
+                      WHERE id_f=%(id_f)s;
+                      """
 
 update_files_done = """
                     UPDATE files_caracteristics 
@@ -116,28 +116,28 @@ update_files_done = """
                     """
 
 delete_files = """
-              DELETE FROM files 
-              WHERE id_f=%(id_f)s;
-              """
+                DELETE FROM files 
+                WHERE id_f=%(id_f)s;
+                """
 
 #---------------------- Tables des liens projets fichiers ----------------------#
 drop_projects_files_link = """
-            DROP TABLE IF EXISTS projects_files_links CASCADE;
-            """
+                          DROP TABLE IF EXISTS projects_files_links CASCADE;
+                          """
 
 # CASCADE means that the updated values of the referenced column(s) should be copied into the referencing row(s)
 projects_files_link = """
-        CREATE TABLE IF NOT EXISTS projects_files_links (
-          id_p_f_l SERIAL PRIMARY KEY,
-          id_pa INTEGER REFERENCES project_analyse ON DELETE CASCADE,
-          id_f INTEGER REFERENCES files ON DELETE CASCADE
-        )
-      """
+                      CREATE TABLE IF NOT EXISTS projects_files_links (
+                        id_p_f_l SERIAL PRIMARY KEY,
+                        id_pa INTEGER REFERENCES project_analyse ON DELETE CASCADE,
+                        id_f INTEGER REFERENCES files ON DELETE CASCADE
+                      )
+                    """
 
 insert_projects_files_links = """
-              INSERT INTO projects_files_links (id_pa, id_f)
-              VALUES (%(id_pa)s, %(id_f)s) returning id_p_f_l;
-              """
+                              INSERT INTO projects_files_links (id_pa, id_f)
+                              VALUES (%(id_pa)s, %(id_f)s) returning id_p_f_l;
+                              """
 
 select_files_id_pa = """
                     SELECT id_pa 

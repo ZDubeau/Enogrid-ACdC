@@ -11,4 +11,4 @@ flask run
 celery -A app.celery worker
 
 # Pytest
-pytest --ignore=data
+pytest --ignore=data --full-trace
