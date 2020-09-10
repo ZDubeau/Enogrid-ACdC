@@ -119,20 +119,21 @@ $(document).ready(function () {
     ],
     "order": [[0, "desc"]],
     "fnRowCallback": function (nRow, aData) {
-      var id = aData[0];
+      var id_f = aData[0];
+      var id_pa = aData[1];
       if (aData[3] == "Analysé") {
         $('td:eq(7)', nRow).html(download);
         $('td:eq(7)', nRow).click(function () {
-          window.location.href = '/download_file/' + id;
+          window.location.href = '/download_file/' + id_f;
         });
         $('td:eq(8)', nRow).html(cancel);
         $('td:eq(8)', nRow).click(function () {
-          window.location.href = '/delete_file/' + id;
+          window.location.href = '/delete_file/' + id_f + "/" + id_pa;
         });
       } else if (aData[3] == "Erreur") {
         $('td:eq(8)', nRow).html(cancel);
         $('td:eq(8)', nRow).click(function () {
-          window.location.href = '/delete_file/' + id;
+          window.location.href = '/delete_file/' + id_f + "/" + id_pa;
         });
       }
     }
@@ -148,7 +149,8 @@ $(document).ready(function () {
       { "width": "20px", "targets": 5 },
       { "width": "25px", "targets": 6 },
       { "width": "25px", "targets": 7 },
-      { "width": "25px", "targets": 8 }
+      { "width": "25px", "targets": 8 },
+      { "width": "25px", "targets": 9 }
     ],
     "columns": [
       { title: "" },
@@ -159,7 +161,8 @@ $(document).ready(function () {
       { title: "kWh_standardisé" },
       { title: "Delta (ppb)" },
       { title: "Télécharger (nm)" },
-      { title: "Télécharger (sd)" }
+      { title: "Télécharger (sd)" },
+      { title: "Ajouter à un projet" }
     ],
     "order": [[0, "desc"]],
     "fnRowCallback": function (nRow, aData) {
@@ -180,6 +183,10 @@ $(document).ready(function () {
       $('td:eq(7)', nRow).html(download);
       $('td:eq(7)', nRow).click(function () {
         window.location.href = '/download_file/' + id;
+      });
+      $('td:eq(8)', nRow).html(edit);
+      $('td:eq(8)', nRow).click(function () {
+        window.location.href = '/add_file_to_project/' + id;
       });
     }
   });

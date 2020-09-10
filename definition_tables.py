@@ -49,6 +49,14 @@ delete_project_analyse = """
                         WHERE id_pa=%(id_pa)s; 
                         """
 
+select_project_without_file_associated = """
+                        SELECT *
+                        FROM project_analyse 
+                        WHERE id_pa NOT IN (SELECT id_pa 
+                                              FROM projects_files_links 
+                                              WHERE id_f=%(id_f)s); 
+                        """
+
 #---------------------- Tables des fichiers ----------------------#
 
 drop_files = """
@@ -147,8 +155,13 @@ select_files_id_pa = """
 
 select_files_id_with_id_pa = """
                             SELECT id_f 
-                            FROM files 
+                            FROM projects_files_links 
                             WHERE id_pa=%(id_pa)s;
+                            """
+
+delete_project_file_link = """
+                            DELETE FROM projects_files_links
+                            WHERE id_pa=%(id_pa)s AND id_f=%(id_f)s;
                             """
 
 #------------------- Table resultat ---------------------#

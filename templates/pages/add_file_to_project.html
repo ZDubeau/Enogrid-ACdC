@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block page %}
+<form id="app" class="form-inline" action="/add_file_to_this_project" method="post">
+    <div class="col-md-1 mb-3" style="margin-top: 15px;">
+        <label class="label" style="font-size: 14px;color: #17a2b8;">Ajouter au Projet</label>
+        <select class="custom-select" name="project" required>
+            <option></option>
+            {% for line in project  %}
+            <option value="{{line[0]}}">{{line[1]}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <input name="file" type="text" value="{{file}}" hidden>
+        <button type="submit" class="btn btn-primary mb-2">Ajouter</button>
+    </div>
+</form>
+<h3 style="color: khaki;padding-top: 25px;">{{errorMessage}}</h3>
+{% endblock page %}

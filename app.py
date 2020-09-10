@@ -149,7 +149,7 @@ def get_download_files(id):
     for row in all_id_f:
         id_f = row[0]
         pd.read_sql(f'SELECT date_time, kwh FROM result WHERE id_f={id_f} ORDER BY date_time ASC;', engine).to_csv(
-            os.path.join(os.getcwd(), app.config['DOWNLOAD_FOLDER'], f'file_{id_f}.csv'), sep=";", decimal=",")
+            path_or_buf=os.path.join(os.getcwd(), app.config['DOWNLOAD_FOLDER'], f'file_{id_f}.csv'), sep=";", decimal=",")
     fileobj = io.BytesIO()
     with zipfile.ZipFile(fileobj, 'w') as zip_file:
         for root, dirs, files in os.walk(os.path.join(
@@ -182,16 +182,14 @@ def get_project_delete(id):
 #___________________________ Remove File ____________________________#
 
 
-@app.route('/delete_file/<id>', methods=['GET'])
-def get_delete_file(id):
+@app.route('/delete_file/<id_f>/<id_pa>', methods=['GET'])
+def get_delete_file(id_f, id_pa):
     conn, cur = ConnexionDB()
-    Execute_SQL(cur, td.select_files_id_pa, {'id_f': id})
-    id_pa = cur.fetchone()[0]
-    Execute_SQL(cur, td.delete_files, {'id_f': id})
-    Execute_SQL(cur, td.delete_result_for_file, {'id_f': id})
+    Execute_SQL(cur, td.delete_project_file_link,
+                {'id_pa': id_pa, 'id_f': id_f})
     Commit(conn)
     DeconnexionDB(conn, cur)
-    return redirect(url_for("get_project_edit", errorMessage="Le fichier et ses résultats ont bien été supprimé !", id=id_pa))
+    return redirect(url_for("get_project_edit", errorMessage="Le fichier a été supprimé du projet !", id=id_pa))
 
 #__________________________ Download File ___________________________#
 
@@ -201,7 +199,6 @@ def get_download_file(id):
     engine = make_engine()
     df_file_result = pd.read_sql(
         f'SELECT date_time, kwh FROM result WHERE id_f={id} ORDER BY date_time ASC;', engine)
-    #resp = make_response(df_file_result.to_csv(), sep=";", decimal=",")
     resp = make_response(df_file_result.to_csv(sep=";", decimal=","))
     resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
     resp.headers["Content-Type"] = "text/csv"
@@ -226,8 +223,33 @@ def get_download_file_normalise(id):
 @app.route('/files', methods=['GET'])
 def get_files():
     engine = make_engine()
-    df_files = pd.read_sql("SELECT f.id_f as id_file, f.file_name as name, f.file_type as type, fc.template, fc.kwh_one_year_normal as kwh_normalisé, fc.kwh_one_year_standard as kwh_standardisé, (CASE WHEN fc.kwh_one_year_normal=0 THEN NULL WHEN fc.kwh_one_year_normal IS NULL THEN NULL ELSE 1000000000*(1-fc.kwh_one_year_standard/fc.kwh_one_year_normal) END) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd FROM files AS f LEFT JOIN files_caracteristics AS fc ON f.id_f=fc.id_f", engine)
+    df_files = pd.read_sql("SELECT f.id_f as id_file, f.file_name as name, f.file_type as type, fc.template, fc.kwh_one_year_normal as kwh_normalisé, fc.kwh_one_year_standard as kwh_standardisé, (CASE WHEN fc.kwh_one_year_normal=0 THEN NULL WHEN fc.kwh_one_year_normal IS NULL THEN NULL ELSE 1000000000*(1-fc.kwh_one_year_standard/fc.kwh_one_year_normal) END) as delta_ppm, '' as télécharger_nm, '' as télécharger_sd, '' as add_to_project FROM files AS f LEFT JOIN files_caracteristics AS fc ON f.id_f=fc.id_f", engine)
     return render_template('pages/files.html', tables_files=[df_files.to_html(classes='table table-bordered', table_id='dataTableProjectEditAllFiles', index=False)])
+
+#__________________________ Add File to Project ___________________________#
+
+
+@app.route('/add_file_to_project/<id>', methods=['GET'])
+def add_file_to_project(id):
+    conn, cur = ConnexionDB()
+    Execute_SQL(cur, td.select_project_without_file_associated, {'id_f': id})
+    project = cur.fetchall()
+    print(project)
+    DeconnexionDB(conn, cur)
+    return render_template('pages/add_file_to_project.html', project=project, file=id)
+
+
+@app.route('/add_file_to_this_project', methods=['POST'])
+def add_file_to_this_project():
+    conn, cur = ConnexionDB()
+    file = request.form['file']
+    id_pa = request.form["project"]
+    print(file, id_pa)
+    Execute_SQL(cur, td.insert_projects_files_links,
+                {'id_pa': id_pa, 'id_f': file})
+    Commit(conn)
+    DeconnexionDB(conn, cur)
+    return redirect(url_for("get_files"))
 
 #_____________________________ Add File _____________________________#
 
